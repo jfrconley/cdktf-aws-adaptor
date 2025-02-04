@@ -103,6 +103,8 @@ describe("Appsync mappings", () => {
                 },
                 AppsyncGraphqlApi,
                 {
+                    mergedApiExecutionRoleArn: "merged-api-execution-role-arn",
+                    apiType: "GRAPHQL",
                     schema: undefined,
                     introspectionConfig: "test-introspection-config",
                     queryDepthLimit: 60,

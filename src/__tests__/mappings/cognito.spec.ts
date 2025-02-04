@@ -214,6 +214,11 @@ describe("Cognito mappings", () => {
         synthesizeElementAndTestStability(
             CfnUserPool,
             {
+                userPoolTier: "STANDARD",
+                emailAuthenticationMessage: "email-authentication-message",
+                emailAuthenticationSubject: "email-authentication-subject",
+                webAuthnRelyingPartyId: "web-authn-relying-party-id",
+                webAuthnUserVerification: "required",
                 schema: [
                     {
                         name: "name",
@@ -305,6 +310,9 @@ describe("Cognito mappings", () => {
                 },
                 smsVerificationMessage: "sms-verification-message",
                 policies: {
+                    signInPolicy: {
+                        allowedFirstAuthFactors: ["SMS"],
+                    },
                     passwordPolicy: {
                         temporaryPasswordValidityDays: 60,
                         requireLowercase: true,
@@ -338,6 +346,18 @@ describe("Cognito mappings", () => {
             CognitoUserPool,
             {
                 name: "user-pool-name",
+                userPoolTier: "STANDARD",
+                emailMfaConfiguration: {
+                    message: "email-authentication-message",
+                    subject: "email-authentication-subject",
+                },
+                signInPolicy: {
+                    allowedFirstAuthFactors: ["SMS"],
+                },
+                webAuthnConfiguration: {
+                    userVerification: "required",
+                    relyingPartyId: "web-authn-relying-party-id",
+                },
                 usernameAttributes: ["email"],
                 autoVerifiedAttributes: ["email"],
                 aliasAttributes: ["email"],
@@ -465,6 +485,7 @@ describe("Cognito mappings", () => {
                 customDomainConfig: { certificateArn: "SomeArn" },
                 domain: "auth.example.com",
                 userPoolId: "userPoolId",
+                managedLoginVersion: 1,
             },
             CognitoUserPoolDomain,
             {

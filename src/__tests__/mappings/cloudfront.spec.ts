@@ -25,6 +25,7 @@ describe("CloudFront", () => {
                 value: "my-distribution",
             }],
             distributionConfig: {
+                anycastIpListId: "anycast-ip-list-id",
                 s3Origin: {
                     originAccessIdentity: "origin-access-identity/cloudfront/E127EXAMPLE51Z",
                     dnsName: "example.com",
@@ -37,6 +38,9 @@ describe("CloudFront", () => {
                     dnsName: "example.com",
                 },
                 defaultCacheBehavior: {
+                    grpcConfig: {
+                        enabled: true,
+                    },
                     allowedMethods: ["GET", "HEAD"],
                     cachedMethods: ["GET", "HEAD"],
                     compress: true,
@@ -107,6 +111,9 @@ describe("CloudFront", () => {
                 },
                 cacheBehaviors: [
                     {
+                        grpcConfig: {
+                            enabled: true,
+                        },
                         allowedMethods: ["GET", "HEAD"],
                         cachedMethods: ["GET", "HEAD"],
                         compress: true,
@@ -158,6 +165,7 @@ describe("CloudFront", () => {
                 originGroups: {
                     items: [
                         {
+                            selectionCriteria: "selection-criteria",
                             members: {
                                 items: [
                                     {
@@ -216,6 +224,9 @@ describe("CloudFront", () => {
                 Name: "my-distribution",
             },
             defaultCacheBehavior: {
+                grpcConfig: {
+                    enabled: true,
+                },
                 allowedMethods: ["GET", "HEAD"],
                 cachedMethods: ["GET", "HEAD"],
                 compress: true,
@@ -286,6 +297,9 @@ describe("CloudFront", () => {
             },
             orderedCacheBehavior: [
                 {
+                    grpcConfig: {
+                        enabled: true,
+                    },
                     allowedMethods: ["GET", "HEAD"],
                     cachedMethods: ["GET", "HEAD"],
                     compress: true,
@@ -347,6 +361,11 @@ describe("CloudFront", () => {
             webAclId: "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/my-web-acl",
             origin: [
                 {
+                    vpcOriginConfig: {
+                        originKeepaliveTimeout: 5,
+                        originReadTimeout: 30,
+                        vpcOriginId: "vpc-origin-id",
+                    },
                     connectionAttempts: 3,
                     connectionTimeout: 10,
                     customHeader: [
@@ -389,6 +408,7 @@ describe("CloudFront", () => {
                 value: "my-distribution",
             }],
             distributionConfig: {
+                anycastIpListId: "anycast-ip-list-id",
                 s3Origin: {
                     originAccessIdentity: "origin-access-identity/cloudfront/E127EXAMPLE51Z",
                     dnsName: "example.com",
@@ -424,6 +444,7 @@ describe("CloudFront", () => {
                     items: [
                         {
                             id: "my-origin-group",
+                            selectionCriteria: "selection-criteria",
                             failoverCriteria: {
                                 statusCodes: {
                                     items: [500, 502],
@@ -445,6 +466,9 @@ describe("CloudFront", () => {
                 cnamEs: ["example.com"],
                 cacheBehaviors: [
                     {
+                        grpcConfig: {
+                            enabled: true,
+                        },
                         allowedMethods: ["GET", "HEAD"],
                         cachedMethods: ["GET", "HEAD"],
                         compress: true,
@@ -487,6 +511,9 @@ describe("CloudFront", () => {
                     },
                 ],
                 defaultCacheBehavior: {
+                    grpcConfig: {
+                        enabled: true,
+                    },
                     allowedMethods: ["GET", "HEAD"],
                     cachedMethods: ["GET", "HEAD"],
                     compress: true,
@@ -614,6 +641,9 @@ describe("CloudFront", () => {
             ],
             orderedCacheBehavior: [
                 {
+                    grpcConfig: {
+                        enabled: true,
+                    },
                     allowedMethods: ["GET", "HEAD"],
                     cachedMethods: ["GET", "HEAD"],
                     compress: true,
@@ -656,6 +686,9 @@ describe("CloudFront", () => {
                 },
             ],
             defaultCacheBehavior: {
+                grpcConfig: {
+                    enabled: true,
+                },
                 allowedMethods: ["GET", "HEAD"],
                 cachedMethods: ["GET", "HEAD"],
                 compress: true,
@@ -714,6 +747,11 @@ describe("CloudFront", () => {
                 {
                     connectionAttempts: 3,
                     connectionTimeout: 10,
+                    vpcOriginConfig: {
+                        originKeepaliveTimeout: 5,
+                        originReadTimeout: 30,
+                        vpcOriginId: "vpc-origin-id",
+                    },
                     customHeader: [
                         {
                             name: "MyCustomHeader",

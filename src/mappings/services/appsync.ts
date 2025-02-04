@@ -238,7 +238,6 @@ export function registerAppSyncMappings() {
         unsupportedProps: ["MetricsConfig"],
         attributes: {
             Ref: (resource) => resource.id,
-            Id: (resource) => resource.id,
             Name: (resource) => resource.name,
             DataSourceArn: (resource) => resource.arn,
         },

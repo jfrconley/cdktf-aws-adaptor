@@ -8,6 +8,12 @@ describe("Logs mappings", () => {
     itShouldMapCfnElementToTerraformResource(
         CfnLogGroup,
         {
+            fieldIndexPolicies: [
+                {
+                    fieldToMatch: "test-field-to-match",
+                    sortingKeys: ["test-sorting-key"],
+                },
+            ],
             kmsKeyId: "test-kms-key-id",
             logGroupName: "test-log-group-name",
             retentionInDays: 1,
@@ -36,6 +42,12 @@ describe("Logs mappings", () => {
         },
         CloudwatchLogGroup,
         {
+            fieldIndexPolicies: [
+                {
+                    fieldToMatch: "test-field-to-match",
+                    sortingKeys: ["test-sorting-key"],
+                },
+            ],
             tags: {
                 "test-tag-key": "test-tag-value",
             },

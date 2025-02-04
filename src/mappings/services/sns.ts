@@ -31,7 +31,6 @@ export function registerSnsMappings() {
         },
         unsupportedProps: ["Region"],
         attributes: {
-            Id: (resource) => resource.id,
             Arn: (resource) => resource.arn,
             Ref: (resource) => resource.id,
         },

@@ -168,7 +168,6 @@ export function registerLambdaMappings() {
                     systemLogLevel: lambdaProps.LoggingConfig?.SystemLogLevel as string,
                 },
                 description: lambdaProps.Description,
-                // eslint-disable-next-line @typescript-eslint/naming-convention
                 tags: Object.fromEntries(
                     lambdaProps.Tags?.map(({
                         Key,
@@ -315,6 +314,7 @@ export function registerLambdaMappings() {
         attributes: {
             Ref: (resource: LambdaEventSourceMapping) => resource.id,
             Id: (resource: LambdaEventSourceMapping) => resource.id,
+            EventSourceMappingArn: (resource: LambdaEventSourceMapping) => resource.arn,
         },
     });
 }

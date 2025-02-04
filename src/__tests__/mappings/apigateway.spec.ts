@@ -171,6 +171,7 @@ describe("Apigateway mappings", () => {
                 domainName: "domain-name",
                 stage: "stage",
                 id: "id",
+            
             },
             ApiGatewayBasePathMapping,
             {
@@ -178,6 +179,7 @@ describe("Apigateway mappings", () => {
                 basePath: "base-path",
                 domainName: "domain-name",
                 stageName: "stage",
+                domainNameId: "domain-name-id",
             },
         );
     });
