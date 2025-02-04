@@ -1,8 +1,11 @@
-import { CloudfrontDistribution } from "@cdktf/provider-aws/lib/cloudfront-distribution/index.js";
+import {
+    CloudfrontDistribution,
+    type CloudfrontDistributionOrigin,
+} from "@cdktf/provider-aws/lib/cloudfront-distribution/index.js";
 import { CloudfrontOriginAccessIdentity } from "@cdktf/provider-aws/lib/cloudfront-origin-access-identity/index.js";
 import { CfnCloudFrontOriginAccessIdentity, CfnDistribution } from "aws-cdk-lib/aws-cloudfront";
-import { itShouldMapCfnElementToTerraformResource } from "../helpers.js";
-
+import { type DeepRequiredProperties, itShouldMapCfnElementToTerraformResource } from "../helpers.js";
+import {} from "../helpers.js";
 describe("CloudFront", () => {
     itShouldMapCfnElementToTerraformResource(
         CfnCloudFrontOriginAccessIdentity,
@@ -361,11 +364,6 @@ describe("CloudFront", () => {
             webAclId: "arn:aws:wafv2:us-east-1:111111111111:regional/webacl/my-web-acl",
             origin: [
                 {
-                    vpcOriginConfig: {
-                        originKeepaliveTimeout: 5,
-                        originReadTimeout: 30,
-                        vpcOriginId: "vpc-origin-id",
-                    },
                     connectionAttempts: 3,
                     connectionTimeout: 10,
                     customHeader: [
@@ -393,11 +391,16 @@ describe("CloudFront", () => {
                     s3OriginConfig: {
                         originAccessIdentity: "origin-access-identity/cloudfront/E127EXAMPLE51Z",
                     },
-                },
+                } as DeepRequiredProperties<CloudfrontDistributionOrigin>,
             ],
             staging: true,
         },
-        ["distributionConfig.s3Origin", "distributionConfig.customOrigin"],
+        [
+            "distributionConfig.s3Origin",
+            "distributionConfig.customOrigin",
+            "distributionConfig.originGroups.items.*.selectionCriteria",
+            "distributionConfig.anycastIpListId",
+        ],
     );
 
     itShouldMapCfnElementToTerraformResource(
@@ -747,11 +750,6 @@ describe("CloudFront", () => {
                 {
                     connectionAttempts: 3,
                     connectionTimeout: 10,
-                    vpcOriginConfig: {
-                        originKeepaliveTimeout: 5,
-                        originReadTimeout: 30,
-                        vpcOriginId: "vpc-origin-id",
-                    },
                     customHeader: [
                         {
                             name: "MyCustomHeader",
@@ -777,9 +775,14 @@ describe("CloudFront", () => {
                         originReadTimeout: 30,
                         originSslProtocols: ["TLSv1.2"],
                     },
-                },
+                } as DeepRequiredProperties<CloudfrontDistributionOrigin>,
             ],
         },
-        ["distributionConfig.s3Origin", "distributionConfig.customOrigin"],
+        [
+            "distributionConfig.s3Origin",
+            "distributionConfig.customOrigin",
+            "distributionConfig.originGroups.items.*.selectionCriteria",
+            "distributionConfig.anycastIpListId",
+        ],
     );
 });

@@ -43,6 +43,7 @@ export function registerSnsMappings() {
 
             let topicConfig: SnsTopicConfig = {
                 name: props?.TopicName,
+
                 displayName: props?.DisplayName,
                 kmsMasterKeyId: props?.KmsMasterKeyId,
                 archivePolicy: props?.ArchivePolicy && Fn.jsonencode(props.ArchivePolicy),
@@ -152,6 +153,7 @@ export function registerSnsMappings() {
 
             return topic;
         },
+        unsupportedProps: ["FifoThroughputScope"],
         attributes: {
             TopicName: (resource) => resource.name,
             TopicArn: (resource) => resource.arn,

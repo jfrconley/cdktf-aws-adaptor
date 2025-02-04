@@ -1,5 +1,56 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`Logs mappings > Should map AWS::Logs::LogGroup 1`] = `
+"{
+  "provider": {
+    "aws": [
+      {
+        "alias": "us_east_1",
+        "region": "us-east-1"
+      }
+    ]
+  },
+  "resource": {
+    "aws_cloudwatch_log_group": {
+      "resource_22C949BF": {
+        "kms_key_id": "test-kms-key-id",
+        "log_group_class": "test-log-group-class",
+        "name": "test-log-group-name",
+        "retention_in_days": 1,
+        "tags": {
+          "test-tag-key": "test-tag-value"
+        }
+      }
+    },
+    "aws_cloudwatch_log_index_policy": {
+      "resource_index-policy-0_F6C8BC85": {
+        "log_group_name": "\${aws_cloudwatch_log_group.resource_22C949BF.name}",
+        "policy_document": "\${jsonencode({\\"fieldToMatch\\" = \\"test-field-to-match\\", \\"sortingKeys\\" = [\\"test-sorting-key\\"]})}"
+      }
+    }
+  },
+  "terraform": {
+    "backend": {
+      "local": {
+        "path": "/terraform.test-stack.tfstate"
+      }
+    },
+    "required_providers": {
+      "aws": {
+        "source": "aws",
+        "version": "5.85.0"
+      }
+    }
+  },
+  "variable": {
+    "resource_refs_CDA17697": {
+      "default": "\${aws_cloudwatch_log_group.resource_22C949BF.arn}",
+      "type": "string"
+    }
+  }
+}"
+`;
+
 exports[`Logs mappings > Should map AWS::Logs::ResourcePolicy 1`] = `
 "{
   "provider": {

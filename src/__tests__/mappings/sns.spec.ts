@@ -122,6 +122,7 @@ describe("SNS mappings", () => {
                     tracingConfig: "PASSTHROUGH",
                     contentBasedDeduplication: true,
                 },
+                ["fifoThroughputScope"],
             );
 
             expect(synth).toHaveResourceWithProperties(SnsTopicDataProtectionPolicy, {

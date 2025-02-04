@@ -347,6 +347,8 @@ describe("Cognito mappings", () => {
             {
                 name: "user-pool-name",
                 userPoolTier: "STANDARD",
+                emailVerificationMessage: "email-verification-message",
+                emailVerificationSubject: "email-verification-subject",
                 emailMfaConfiguration: {
                     message: "email-authentication-message",
                     subject: "email-authentication-subject",
@@ -371,8 +373,6 @@ describe("Cognito mappings", () => {
                 softwareTokenMfaConfiguration: {
                     enabled: false,
                 },
-                emailVerificationMessage: undefined,
-                emailVerificationSubject: undefined,
                 emailConfiguration: {
                     emailSendingAccount: "COGNITO_DEFAULT",
                     configurationSet: "configuration-set",
@@ -493,6 +493,7 @@ describe("Cognito mappings", () => {
                 domain: "auth.example.com",
                 userPoolId: "userPoolId",
             },
+            ["managedLoginVersion"],
         );
     });
 });

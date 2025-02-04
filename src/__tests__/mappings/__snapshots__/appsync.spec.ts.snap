@@ -142,6 +142,7 @@ exports[`Appsync mappings > AWS::AppSync::GraphQLApi > Should translate API with
             }
           }
         ],
+        "api_type": "GRAPHQL",
         "authentication_type": "API_KEY",
         "enhanced_metrics_config": {
           "data_source_level_metrics_behavior": "test-data-source-level-metrics-behavior",
@@ -159,6 +160,7 @@ exports[`Appsync mappings > AWS::AppSync::GraphQLApi > Should translate API with
           "exclude_verbose_content": true,
           "field_log_level": "field-log-level"
         },
+        "merged_api_execution_role_arn": "merged-api-execution-role-arn",
         "name": "api-name",
         "openid_connect_config": {
           "auth_ttl": 60,

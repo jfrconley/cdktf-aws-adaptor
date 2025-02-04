@@ -251,9 +251,10 @@ describe("DynamoDB mappings", () => {
             streamEnabled: true,
         },
         [
-            "onDemandThroughput",
+            "pointInTimeRecoverySpecification.recoveryPeriodInDays",
+            "warmThroughput",
+            "globalSecondaryIndexes.*.warmThroughput",
             "sseSpecification.sseType",
-            "globalSecondaryIndexes.*.onDemandThroughput",
             "kinesisStreamSpecification.approximateCreationDateTimePrecision",
         ],
     );

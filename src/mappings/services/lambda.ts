@@ -257,6 +257,19 @@ export function registerLambdaMappings() {
                 scope,
                 id,
                 deleteUndefinedKeys({
+                    metricsConfig: {
+                        metrics: props?.MetricsConfig?.Metrics as string[],
+                    },
+                    provisionedPollerConfig: {
+                        maximumPollers: props.ProvisionedPollerConfig?.MaximumPollers,
+                        minimumPollers: props.ProvisionedPollerConfig?.MinimumPollers,
+                    },
+                    tags: Object.fromEntries(
+                        props.Tags?.map(({
+                            Key,
+                            Value,
+                        }) => [Key, Value]) || [],
+                    ),
                     functionName: props.FunctionName as string,
                     maximumRecordAgeInSeconds: props.MaximumRecordAgeInSeconds,
                     eventSourceArn: props.EventSourceArn,

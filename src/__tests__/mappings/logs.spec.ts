@@ -42,12 +42,6 @@ describe("Logs mappings", () => {
         },
         CloudwatchLogGroup,
         {
-            fieldIndexPolicies: [
-                {
-                    fieldToMatch: "test-field-to-match",
-                    sortingKeys: ["test-sorting-key"],
-                },
-            ],
             tags: {
                 "test-tag-key": "test-tag-value",
             },

@@ -165,7 +165,7 @@ describe("Appsync mappings", () => {
                         "tag-key": "tag-value",
                     },
                 },
-                ["ownerContact", "apiType", "mergedApiExecutionRoleArn", "environmentVariables"],
+                ["ownerContact", "environmentVariables"],
             );
         });
 
