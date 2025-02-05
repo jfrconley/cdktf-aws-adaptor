@@ -1,5 +1,5 @@
 {
-  "name": "@nrfcloud/cdktf-aws-adaptor",
+  "name": "@jfconley/cdktf-aws-adaptor",
   "version": "0.11.0",
   "description": "A compatibility layer for using the CDK for Terraform with AWS CDK constructs",
   "type": "module",
@@ -34,7 +34,7 @@
       "import": "./dist/index.js"
     }
   },
-  "repository": "https://github.com/nRFCloud/ts-json-schema-transformer",
+  "repository": "https://github.com/jfrconley/ts-json-schema-transformer",
   "scripts": {
     "prepare": "husky install",
     "lint": "dprint check && eslint --cache .",
