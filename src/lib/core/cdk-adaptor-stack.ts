@@ -798,12 +798,34 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
             }
 
             case "Fn::Sub": {
-                const [rawString, replacementMap]: [string, { [key: string]: unknown }] = params as [
-                    string,
-                    { [key: string]: unknown },
-                ];
+
+                const pseudoReplacementMap = {
+                    "AWS::AccountId": this.awsCallerIdentity.accountId,
+                    "AWS::Region": this.awsRegion.name,
+                    "AWS::Partition": this.awsPartition.partition,
+                    "AWS::StackName": this.node.id,
+                    "AWS::URLSuffix": this.awsPartition.dnsSuffix,
+                };
+
+                let rawString: string;
+                if (typeof params === "string") {
+                    rawString = params;
+                } else {
+                    rawString = params[0] as string;
+                }
+
+                // naively replace pseudo references with their values
+                Object.entries(pseudoReplacementMap).forEach(([pseudoRef, value]) => {
+                    rawString = rawString.replace(new RegExp(`\\$\\{${pseudoRef}\\}`, "g"), value);
+                });
 
                 let resultString: string = this.processIntrinsics(rawString);
+
+                if (typeof params[1] !== "object") {
+                    return resultString;
+                }
+
+                const replacementMap = params[1] as { [key: string]: unknown };
 
                 // replacementMap is an object
                 Object.entries(replacementMap).map(([rawVarName, rawVarValue]) => {
