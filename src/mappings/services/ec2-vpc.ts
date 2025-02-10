@@ -56,35 +56,37 @@ export function registerEC2VPCMappings() {
         },
     });
 
-    registerMappingTyped(CfnRoute, Route, {
-        resource: (scope, id, props) => {
-            return new Route(
-                scope,
-                id,
-                deleteUndefinedKeys({
-                    destinationCidrBlock: props.DestinationCidrBlock,
-                    destinationIpv6CidrBlock: props.DestinationIpv6CidrBlock,
-                    destinationPrefixListId: props.DestinationPrefixListId,
-                    egressOnlyGatewayId: props.EgressOnlyInternetGatewayId,
-                    gatewayId: props.GatewayId,
-                    routeTableId: props.RouteTableId,
-                    instanceId: props.InstanceId,
-                    carrierGatewayId: props.CarrierGatewayId,
-                    natGatewayId: props.NatGatewayId,
-                    networkInterfaceId: props.NetworkInterfaceId,
-                    transitGatewayId: props.TransitGatewayId,
-                    vpcPeeringConnectionId: props.VpcPeeringConnectionId,
-                    coreNetworkArn: props.CoreNetworkArn,
-                    localGatewayId: props.LocalGatewayId,
-                    vpcEndpointId: props.VpcEndpointId,
-                }),
-            );
-        },
-        attributes: {
-            CidrBlock: (route: Route) => route.destinationCidrBlock,
-            Ref: (route: Route) => route.id,
-        },
-    });
+    registerMapping("AWS::EC2::Route", createGenericCCApiMapping("AWS::EC2::Route"));
+
+    // registerMappingTyped(CfnRoute, Route, {
+    //     resource: (scope, id, props) => {
+    //         return new Route(
+    //             scope,
+    //             id,
+    //             deleteUndefinedKeys({
+    //                 destinationCidrBlock: props.DestinationCidrBlock,
+    //                 destinationIpv6CidrBlock: props.DestinationIpv6CidrBlock,
+    //                 destinationPrefixListId: props.DestinationPrefixListId,
+    //                 egressOnlyGatewayId: props.EgressOnlyInternetGatewayId,
+    //                 gatewayId: props.GatewayId,
+    //                 routeTableId: props.RouteTableId,
+    //                 instanceId: props.InstanceId,
+    //                 carrierGatewayId: props.CarrierGatewayId,
+    //                 natGatewayId: props.NatGatewayId,
+    //                 networkInterfaceId: props.NetworkInterfaceId,
+    //                 transitGatewayId: props.TransitGatewayId,
+    //                 vpcPeeringConnectionId: props.VpcPeeringConnectionId,
+    //                 coreNetworkArn: props.CoreNetworkArn,
+    //                 localGatewayId: props.LocalGatewayId,
+    //                 vpcEndpointId: props.VpcEndpointId,
+    //             }),
+    //         );
+    //     },
+    //     attributes: {
+    //         CidrBlock: (route: Route) => route.destinationCidrBlock,
+    //         Ref: (route: Route) => route.id,
+    //     },
+    // });
 
     registerMapping("AWS::EC2::EIP", createGenericCCApiMapping("AWS::EC2::EIP"));
 

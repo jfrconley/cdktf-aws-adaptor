@@ -10,6 +10,22 @@ export interface CloudFormationTemplate {
     Conditions?: { [id: string]: any };
     Outputs?: { [id: string]: CloudFormationOutput };
     Mappings?: { [id: string]: { [key: string]: unknown } };
+
+    Parameters?: { [id: string]: CloudFormationParameter };
+}
+
+export interface CloudFormationParameter {
+    readonly Type: string;
+    readonly Default?: unknown;
+    readonly AllowedValues?: unknown[];
+    readonly AllowedPattern?: string;
+    readonly ConstraintDescription?: string;
+    readonly MaxLength?: number;
+    readonly MinLength?: number;
+    readonly MaxValue?: number;
+    readonly MinValue?: number;
+    readonly NoEcho?: boolean;
+    readonly Description?: string;
 }
 
 export interface CloudFormationOutput {

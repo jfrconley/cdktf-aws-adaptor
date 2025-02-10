@@ -1,5 +1,5 @@
 import { camelCase } from "camel-case";
-import { TerraformResource } from "cdktf";
+import { type TerraformElement } from "cdktf";
 import { Construct } from "constructs";
 import createDebug from "debug";
 
@@ -59,7 +59,7 @@ type PropertyMappings = { [cfnProperty: string]: PropertyMapping };
 // TODO: detect if something has been mapped to a tfAttributeName that does not exist in the props of a resource
 // -> needs validations in generated provider bindings!
 
-export type ResourceMapper<T extends TerraformResource> = (
+export type ResourceMapper<T extends TerraformElement> = (
     scope: Construct,
     id: string,
     props: {
@@ -70,7 +70,7 @@ export type ResourceMapper<T extends TerraformResource> = (
     proxy: AccessTracker<{ [key: string]: any }>,
 ) => T | void;
 
-export function createGuessingResourceMapper<T extends TerraformResource>(
+export function createGuessingResourceMapper<T extends TerraformElement>(
     resource: Class<T>,
     propMappings: PropertyMappings = {},
 ): ResourceMapper<T> {

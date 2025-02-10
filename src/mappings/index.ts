@@ -1,3 +1,4 @@
+import { registerParameterMappings } from "./parameters/parameters.js";
 import { registerApiGatewayMappings } from "./services/apigateway.js";
 import { registerAppSyncMappings } from "./services/appsync.js";
 import { registerCertificateManagerMappings } from "./services/certificate-manager.js";
@@ -42,6 +43,7 @@ export function registerMappings() {
     registerSnsMappings();
     registerStepFunctinMappings();
     registerEcsMappings();
+    registerParameterMappings();
 }
 
 registerMappings();

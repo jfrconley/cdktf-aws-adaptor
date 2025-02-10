@@ -12,6 +12,7 @@ import {
     Stack as AWSStack,
     Stage as AWSStage,
     Token as AWSToken,
+    type CfnParameter,
 } from "aws-cdk-lib";
 import {
     App,
@@ -37,9 +38,10 @@ import { toSnakeCase } from "codemaker";
 import { Construct, ConstructOrder, IConstruct } from "constructs";
 import { AccessTracker } from "../../mappings/access-tracker.js";
 import { findMapping, Mapping } from "../../mappings/utils.js";
-import { CloudFormationOutput, CloudFormationResource, CloudFormationTemplate } from "./cfn.js";
+import { CloudFormationOutput, CloudFormationResource, CloudFormationTemplate, type CloudFormationParameter } from "./cfn.js";
 import { reparentConstruct } from "./construct-helpers.js";
 import { TerraformSynthesizer } from "./terraform-synthesizer.js";
+import { findParameterMapping } from "../../mappings/parameters/parameters.js";
 
 function getAwsCDKTokenResolutionCompat() {
     const originalUnresolved = AWSToken.isUnresolved;
@@ -120,8 +122,8 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
     private static readonly mappingForLogicalId: {
         [logicalId: string]: {
             resourceType: string;
-            mapping: Mapping<TerraformResource>;
-            resource?: TerraformResource;
+            mapping: Mapping<TerraformElement>;
+            resource?: TerraformElement;
         };
     } = {};
 
@@ -293,7 +295,20 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
         this.processCfnOutputs(cfn);
         this.processCfnMappings(cfn);
         this.processCfnConditions(cfn);
+        this.processCfnParameters(element, cfn);
         this.processCfnResources(element, cfn);
+    }
+
+    private processCfnParameters(element: CfnElement, cfn: CloudFormationTemplate) {
+        const parameters = cfn.Parameters || {};
+        if (Object.keys(parameters).length > 1) {
+            throw new Error("expected only one parameter in template, got " + Object.keys(parameters).length);
+        }
+
+        for (const [parameterId, args] of Object.entries(cfn.Parameters || {})) {
+            console.log(parameterId, args);
+            this.newTerraformVariable(element, parameterId, args);
+        }
     }
 
     private processCfnOutputs(cfn: CloudFormationTemplate) {
@@ -411,6 +426,31 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
         return this.awsAvailabilityZones[region];
     }
 
+    private newTerraformVariable(currentElement: CfnElement, logicalId: string, props: CloudFormationParameter): TerraformVariable {
+        const m = findParameterMapping(props.Type)
+        if (!m) {
+            throw new Error(`no mapping for ${props.Type}`);
+        }
+
+        const terraformStack = TerraformStack.of(currentElement);
+        const newScope = terraformStack == undefined ? this : currentElement.node.scope as Construct;
+        const proxy = new AccessTracker(props);
+
+        const resolvedProps = this.processIntrinsics(props)
+
+        const res = m.resource(newScope, currentElement.node.id, resolvedProps, proxy);
+        if (!res) {
+            throw new Error(`no resource for ${props.Type}`);
+        }
+
+        AwsTerraformAdaptorStack.mappingForLogicalId[logicalId] = {
+            resourceType: props.Type,
+            mapping: m as unknown as Mapping<TerraformElement>,
+            resource: res,
+        };
+        return res as TerraformVariable;
+    }
+
     private newTerraformResource(
         currentElement: CfnElement,
         logicalId: string,
@@ -448,7 +488,7 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
 
         AwsTerraformAdaptorStack.mappingForLogicalId[logicalId] = {
             resourceType: resource.Type,
-            mapping: m,
+            mapping: m as unknown as Mapping<TerraformElement>,
             resource: res as TerraformResource,
         };
 

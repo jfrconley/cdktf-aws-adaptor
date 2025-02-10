@@ -18,6 +18,7 @@ import { AwsTerraformAdaptorStack } from "../lib/core/cdk-adaptor-stack.js";
 import { ImplicitDependencyAspect } from "../mappings/implicit-dependency-aspect.js";
 import { registerMappings } from "../mappings/index.js";
 import { resourceMappings } from "../mappings/utils.js";
+import { InstanceClass, InstanceSize, InstanceType, NatGatewayProvider, Vpc } from "aws-cdk-lib/aws-ec2";
 
 setupJest();
 
@@ -210,6 +211,31 @@ describe("Stack synthesis", () => {
             // expect(synthed).toHaveResourceWithProperties(CloudcontrolapiResource, {
             //   desired_state:
             //     "${jsonencode({\"BucketName\" = replace(replace(replace(replace(replace(replace(lower(join(\"\", [\"test\", aws_cloudcontrolapi_resource.role_C7B7E775.id])), \"/\", \".\"), \"-\", \"_\"), \"+\", \".\"), \"=\", \"_\"), \",\", \"_\"), \"@\", \".\")})}",
+            // });
+        });
+
+        it("Should resolve CloudFormation parameters", () => {
+            class ParameterStack extends AwsTerraformAdaptorStack {}
+
+            const testApp = Testing.app();
+            const stack = new ParameterStack(testApp, "test-stack", {
+                region: "us-east-1",
+                useCloudControlFallback: true,
+            });
+            const vpc = new Vpc(stack, "vpc", {
+                maxAzs: 3,
+                natGatewayProvider: NatGatewayProvider.instanceV2({
+                    instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.MICRO),
+                })
+            });
+
+            stack.prepareStack();
+
+            const synthed = Testing.synth(stack);
+            console.log(synthed);
+
+            // expect(synthed).toHaveResourceWithProperties(Vpc, {
+            //     nat_gateway_provider: "Instance",
             // });
         });
     });
