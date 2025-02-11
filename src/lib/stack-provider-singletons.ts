@@ -1,5 +1,6 @@
 import { ArchiveProvider } from "@cdktf/provider-archive/lib/provider/index.js";
 import { TerraformProvider, TerraformStack } from "cdktf";
+import { DockerProvider } from "@cdktf/provider-docker/lib/provider/index.js";
 import { Construct } from "constructs";
 import { TimeProvider } from "./core/time/provider/index.js";
 
@@ -18,6 +19,8 @@ function createStackProviderSingleton<
         return existingProvider;
     };
 }
+
+export const getSingletonDockerProvider = createStackProviderSingleton(DockerProvider, {});
 
 export const getSingletonTimeProvider = createStackProviderSingleton(TimeProvider, {});
 

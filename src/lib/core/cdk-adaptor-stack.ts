@@ -5,6 +5,7 @@ import { DataAwsCallerIdentity } from "@cdktf/provider-aws/lib/data-aws-caller-i
 import { DataAwsPartition } from "@cdktf/provider-aws/lib/data-aws-partition/index.js";
 import { DataAwsRegion } from "@cdktf/provider-aws/lib/data-aws-region/index.js";
 import { AwsProvider } from "@cdktf/provider-aws/lib/provider/index.js";
+import debug from "debug";
 import {
     CfnElement,
     CfnResource,
@@ -76,6 +77,7 @@ function getConditionConstructId(conditionId: string) {
 const IS_APP_CONVERTED = Symbol("IS_APP_SYNTH_HOOKED");
 
 export abstract class AwsTerraformAdaptorStack extends TerraformStack {
+    private static readonly adaptorDebug = debug("cdktf-aws-adaptor:stack:debug");
     public readonly useCloudControlFallback: boolean;
     private isConverted = false;
     private readonly awsStage: AWSStage;
@@ -208,6 +210,7 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
      * This method will resolve all references within all tokens
      */
     private resolveCfnInTokenMap() {
+        AwsTerraformAdaptorStack.adaptorDebug("Starting resolution of CloudFormation references in token map");
         cdkTokenResolutionCompat.disableUnresolvedTfTokens();
         const tokenMapInstance = TokenMap.instance();
         const stringTokenMap = (tokenMapInstance as any).stringTokenMap as Map<string, IResolvable>;
@@ -235,6 +238,7 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
         };
 
         const tokens = [...stringTokenMap.values()];
+        AwsTerraformAdaptorStack.adaptorDebug(`Processing ${tokens.length} tokens from token map`);
         for (const resolvable of tokens) {
             for (const k in resolvable) {
                 if (resolvable.hasOwnProperty(k)) {
@@ -243,37 +247,46 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
             }
         }
         cdkTokenResolutionCompat.enableUnresolvedTfTokens();
+        AwsTerraformAdaptorStack.adaptorDebug("Completed resolution of CloudFormation references in token map");
     }
 
     private convertOnce() {
         if (!this.isConverted) {
+            AwsTerraformAdaptorStack.adaptorDebug("Starting one-time conversion of stack");
             cdkTokenResolutionCompat.disableUnresolvedTfTokens();
             this.convert();
             cdkTokenResolutionCompat.enableUnresolvedTfTokens();
             this.isConverted = true;
+            AwsTerraformAdaptorStack.adaptorDebug("Completed one-time conversion of stack");
         }
     }
 
     private convertAllSiblingStacks() {
         const app = App.of(this);
         if ((app as any)[IS_APP_CONVERTED] !== true) {
+            AwsTerraformAdaptorStack.adaptorDebug("Starting conversion of all sibling stacks");
             const stacks = app.node.findAll().filter((child) =>
                 child instanceof AwsTerraformAdaptorStack
             ) as AwsTerraformAdaptorStack[];
+            AwsTerraformAdaptorStack.adaptorDebug(`Found ${stacks.length} sibling stacks to convert`);
             for (const stack of stacks) {
                 stack.convertOnce();
             }
             (app as any)[IS_APP_CONVERTED] = true;
+            AwsTerraformAdaptorStack.adaptorDebug("Completed conversion of all sibling stacks");
         }
     }
 
     prepareStack() {
+        AwsTerraformAdaptorStack.adaptorDebug("Starting stack preparation");
         this.convertAllSiblingStacks();
         super.prepareStack();
         this.resolveCfnInTokenMap();
+        AwsTerraformAdaptorStack.adaptorDebug("Completed stack preparation");
     }
 
     convert() {
+        AwsTerraformAdaptorStack.adaptorDebug("Starting stack conversion");
         this.reparentRootConstructsOfHost();
         for (const r of this.host.node.findAll(ConstructOrder.PREORDER)) {
             if (r instanceof CfnElement) {
@@ -285,9 +298,11 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
                 this.resolveTerraformElement(r);
             }
         }
+        AwsTerraformAdaptorStack.adaptorDebug("Completed stack conversion");
     }
 
     private processCfnElement(element: CfnElement) {
+        AwsTerraformAdaptorStack.adaptorDebug(`Processing CloudFormation element ${element.node.id}`);
         const cfn = this.host.resolve(
             element._toCloudFormation(),
         ) as CloudFormationTemplate;
@@ -297,16 +312,18 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
         this.processCfnConditions(cfn);
         this.processCfnParameters(element, cfn);
         this.processCfnResources(element, cfn);
+        AwsTerraformAdaptorStack.adaptorDebug(`Completed processing CloudFormation element ${element.node.id}`);
     }
 
     private processCfnParameters(element: CfnElement, cfn: CloudFormationTemplate) {
         const parameters = cfn.Parameters || {};
-        if (Object.keys(parameters).length > 1) {
-            throw new Error("expected only one parameter in template, got " + Object.keys(parameters).length);
+        const paramCount = Object.keys(parameters).length;
+        if (paramCount > 1) {
+            throw new Error("expected only one parameter in template, got " + paramCount);
         }
 
         for (const [parameterId, args] of Object.entries(cfn.Parameters || {})) {
-            console.log(parameterId, args);
+            AwsTerraformAdaptorStack.adaptorDebug(`Creating Terraform variable for parameter: ${parameterId}`);
             this.newTerraformVariable(element, parameterId, args);
         }
     }
@@ -349,6 +366,7 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
             );
         }
         for (const [logicalId, resource] of resources) {
+            AwsTerraformAdaptorStack.adaptorDebug(`Creating Terraform resource for logical ID: ${logicalId}, type: ${resource.Type}`);
             this.newTerraformResource(element, logicalId, resource);
         }
     }
@@ -652,13 +670,12 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
     }
 
     private resolveAtt(logicalId: string, attribute: string, isLazy: boolean = false): string {
+        AwsTerraformAdaptorStack.adaptorDebug(`Resolving attribute ${attribute} for logical ID: ${logicalId}`);
         const mapping = AwsTerraformAdaptorStack.mappingForLogicalId[logicalId];
         if (!mapping) {
             // Don't be infinitely lazy
             if (isLazy) {
-                // if the reference can't be resolved at this point, it almost certainly a reference to a resource in another stack that hasn't been converted yet
-                //
-
+                AwsTerraformAdaptorStack.adaptorDebug(`Failed to resolve attribute ${attribute} for logical ID: ${logicalId}`);
                 throw new Error(
                     `unable to resolve a "Ref" to a resource with the logical ID ${logicalId}`,
                 );
@@ -720,6 +737,7 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
     }
 
     private resolveRef(ref: string) {
+        AwsTerraformAdaptorStack.adaptorDebug(`Resolving reference: ${ref}`);
         if (ref?.startsWith("AWS::")) {
             return this.resolvePseudo(ref);
         }
@@ -728,9 +746,12 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
     }
 
     private resolveIntrinsic(fn: string, params: unknown[]): unknown {
+        AwsTerraformAdaptorStack.adaptorDebug(`Resolving intrinsic function: ${fn}`);
         switch (fn) {
             case "Fn::GetAtt": {
-                return this.resolveAtt(params[0] as string, params[1] as string);
+                const [logicalId, attribute] = params as [string, string];
+                AwsTerraformAdaptorStack.adaptorDebug(`Resolving GetAtt for ${logicalId}.${attribute}`);
+                return this.resolveAtt(logicalId, attribute);
             }
 
             case "Fn::Join": {

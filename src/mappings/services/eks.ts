@@ -1,4 +1,4 @@
-export function registerEcsMappings() {
+export function registerEksMappings() {
     // registerMapping("Custom::AWSCDK-EKS-Cluster", {
     //     resource: (scope, id, props) => {
     //         if (props?.Config?.EncryptionConfig && props?.Config?.EncryptionConfig.length > 1) {

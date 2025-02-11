@@ -11,6 +11,12 @@ importers:
       '@cdktf/provider-archive':
         specifier: 10.3.0
         version: 10.3.0(cdktf@0.20.11(constructs@10.4.2))(constructs@10.4.2)
+      '@cdktf/provider-docker':
+        specifier: ^11.0.0
+        version: 11.0.0(cdktf@0.20.11(constructs@10.4.2))(constructs@10.4.2)
+      '@cdktf/provider-null':
+        specifier: ^10.0.1
+        version: 10.0.1(cdktf@0.20.11(constructs@10.4.2))(constructs@10.4.2)
       camel-case:
         specifier: ^5.0.0
         version: 5.0.0
@@ -284,8 +290,22 @@ packages:
       cdktf: ^0.20.0
       constructs: ^10.3.0
 
+  '@cdktf/provider-docker@11.0.0':
+    resolution: {integrity: sha512-AjmDaimbhbzzD5jNtPvB5Dk6rnp/vBSpxeuil99EwsenRqhH+1CB+3N2pkPfr21MwHqA7W4Bxckj42G2nygFLQ==}
+    engines: {node: '>= 18.12.0'}
+    peerDependencies:
+      cdktf: ^0.20.0
+      constructs: ^10.3.0
+
   '@cdktf/provider-generator@0.20.11':
     resolution: {integrity: sha512-cN8rSGM80Do1hq86DuHlgsoXiuKFqIwCr6HQ7uBAqdfbuHuWtGCPEKy1mTAuG0RN6aTvinAGwJGQiofxuzYQeA==}
+
+  '@cdktf/provider-null@10.0.1':
+    resolution: {integrity: sha512-X176VQZFTNi1xSyUEoSb9CsFHfJ9EpcdzCx33UlZMGfQo/DRZC8NT1vHxCQU2TAaB1ZwmnhXEkW2FJO6pB6Pjg==}
+    engines: {node: '>= 18.12.0'}
+    peerDependencies:
+      cdktf: ^0.20.0
+      constructs: ^10.3.0
 
   '@cdktf/provider-schema@0.20.11':
     resolution: {integrity: sha512-PD3TcMVijU//Czk8uvtBAu6fQgPVBVcJRCILTq1Vq3e3qg0igNDZoRVxAvaCRVpp9wXtmVAjByX10vUhB42f+g==}
@@ -2918,8 +2938,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  typescript@5.8.0-dev.20250204:
-    resolution: {integrity: sha512-v8AzZf6U6QRetLje7DEKQCSZfTNqPgrCw93oFB/Li4lb4nZ/630SU6ytE5Lb7j9Sm4DVr+I1qLFicG1eANIQ4w==}
+  typescript@5.8.0-dev.20250210:
+    resolution: {integrity: sha512-6obwAtYV+jgxdpESDO+wGAyiLKQ6tunIjP4TFHqtcL4u5j15XUG2fSjaRN1W006kxHxFigADy9uDHb50l8UxGA==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -3672,6 +3692,11 @@ snapshots:
       cdktf: 0.20.11(constructs@10.4.2)
       constructs: 10.4.2
 
+  '@cdktf/provider-docker@11.0.0(cdktf@0.20.11(constructs@10.4.2))(constructs@10.4.2)':
+    dependencies:
+      cdktf: 0.20.11(constructs@10.4.2)
+      constructs: 10.4.2
+
   '@cdktf/provider-generator@0.20.11(constructs@10.3.0)(debug@4.4.0)':
     dependencies:
       '@cdktf/commons': 0.20.11(constructs@10.3.0)(debug@4.4.0)
@@ -3684,6 +3709,11 @@ snapshots:
       - constructs
       - debug
       - supports-color
+
+  '@cdktf/provider-null@10.0.1(cdktf@0.20.11(constructs@10.4.2))(constructs@10.4.2)':
+    dependencies:
+      cdktf: 0.20.11(constructs@10.4.2)
+      constructs: 10.4.2
 
   '@cdktf/provider-schema@0.20.11(constructs@10.3.0)(debug@4.4.0)':
     dependencies:
@@ -5153,7 +5183,7 @@ snapshots:
     dependencies:
       semver: 7.7.1
       shelljs: 0.8.5
-      typescript: 5.8.0-dev.20250204
+      typescript: 5.8.0-dev.20250210
 
   dprint@0.49.0:
     optionalDependencies:
@@ -6615,7 +6645,7 @@ snapshots:
 
   typescript@5.7.3: {}
 
-  typescript@5.8.0-dev.20250204: {}
+  typescript@5.8.0-dev.20250210: {}
 
   undici-types@5.26.5: {}
 

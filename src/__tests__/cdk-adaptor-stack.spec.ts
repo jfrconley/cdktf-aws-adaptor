@@ -19,6 +19,8 @@ import { ImplicitDependencyAspect } from "../mappings/implicit-dependency-aspect
 import { registerMappings } from "../mappings/index.js";
 import { resourceMappings } from "../mappings/utils.js";
 import { InstanceClass, InstanceSize, InstanceType, NatGatewayProvider, Vpc } from "aws-cdk-lib/aws-ec2";
+import { Compatibility, ContainerImage, FargateTaskDefinition, TaskDefinition } from "aws-cdk-lib/aws-ecs";
+import { DockerImageAsset } from "aws-cdk-lib/aws-ecr-assets";
 
 setupJest();
 
@@ -626,5 +628,35 @@ describe("Stack synthesis", () => {
 
             expect(assetFileStat.isFile()).toBe(true);
         });
+    });
+
+    it("Should support docker image assets", () => {
+        class DockerImageStack extends AwsTerraformAdaptorStack {}
+        const testApp = Testing.app();
+        const testStack = new DockerImageStack(testApp, "test-stack-15", {
+            region: "us-east-1",
+            useCloudControlFallback: true,
+        });
+        
+        const task = new FargateTaskDefinition(testStack, "test-task", {
+            family: "test-task",
+            cpu: 256,
+            memoryLimitMiB: 512,
+            executionRole: new Role(testStack, "test-execution-role", {
+                assumedBy: new ServicePrincipal("ecs-tasks.amazonaws.com"),
+            }),
+        })
+
+        task.addContainer("test-container", {
+            image: ContainerImage.fromAsset(path.join(dirname, "test-app"), {
+                file: "test.Dockerfile",
+            }),
+            essential: true,
+        });
+
+        testStack.prepareStack();
+        const synthesized = Testing.synth(testStack);
+
+        console.log(synthesized);
     });
 });

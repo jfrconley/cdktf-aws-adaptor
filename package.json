@@ -34,7 +34,6 @@
       "import": "./dist/index.js"
     }
   },
-  "repository": "https://github.com/jfrconley/ts-json-schema-transformer",
   "scripts": {
     "prepare": "husky install",
     "lint": "dprint check && eslint --cache .",
@@ -77,6 +76,8 @@
   },
   "dependencies": {
     "@cdktf/provider-archive": "10.3.0",
+    "@cdktf/provider-docker": "^11.0.0",
+    "@cdktf/provider-null": "^10.0.1",
     "camel-case": "^5.0.0",
     "codemaker": "^1.106.0",
     "debug": "^4.4.0",
