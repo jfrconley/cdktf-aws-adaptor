@@ -50,6 +50,7 @@ export class TerraformSynthesizer extends DefaultStackSynthesizer {
                 context: fileAsset.path,
                 dockerfile: asset.dockerFile || 'Dockerfile',
                 target: asset.dockerBuildTarget,
+                platform: asset.platform,
             }
         });
 

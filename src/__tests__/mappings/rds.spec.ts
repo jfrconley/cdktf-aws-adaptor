@@ -1,8 +1,8 @@
-import tf_aws from "@cdktf/provider-aws";
 import { CfnDBCluster } from "aws-cdk-lib/aws-rds";
 import { setupJest } from "cdktf/lib/testing/adapters/jest.js";
 import { registerMappings } from "../../mappings/index.js";
 import { itShouldMapCfnElementToTerraformResource } from "../helpers.js";
+import { RdsCluster } from "@cdktf/provider-aws/lib/rds-cluster/index.js";
 
 setupJest();
 registerMappings();
@@ -95,7 +95,7 @@ describe.skip("RDS mappings", () => {
                     },
                 ],
             },
-            tf_aws.rdsCluster.RdsCluster,
+            RdsCluster,
             {
                 domain: "example.com",
                 domainIamRoleName: "role",

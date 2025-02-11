@@ -1,4 +1,3 @@
-import { cloudwatchLogIndexPolicy } from "@cdktf/provider-aws";
 import { CloudwatchLogGroup, CloudwatchLogGroupConfig } from "@cdktf/provider-aws/lib/cloudwatch-log-group/index.js";
 import {
     CloudwatchLogResourcePolicy,
@@ -8,6 +7,7 @@ import { CfnLogGroup, CfnResourcePolicy } from "aws-cdk-lib/aws-logs";
 import { Fn, type TerraformResource, TerraformStack } from "cdktf";
 import { ImplicitDependencyAspect } from "../implicit-dependency-aspect.js";
 import { deleteUndefinedKeys, registerMapping, registerMappingTyped } from "../utils.js";
+import { CloudwatchLogIndexPolicy } from "@cdktf/provider-aws/lib/cloudwatch-log-index-policy/index.js";
 
 interface LogRetentionProps {
     ServiceToken: string;
@@ -73,7 +73,7 @@ export function registerLogMappings() {
                 proxy.touchPath("FieldIndexPolicies");
                 for (const [idx, policy] of props.FieldIndexPolicies.entries()) {
                     implicitDependencies.push(
-                        new cloudwatchLogIndexPolicy.CloudwatchLogIndexPolicy(logGroup, `index-policy-${idx}`, {
+                        new CloudwatchLogIndexPolicy(logGroup, `index-policy-${idx}`, {
                             logGroupName: logGroup.name,
                             policyDocument: Fn.jsonencode(policy),
                         }),
