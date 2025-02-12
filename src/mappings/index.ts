@@ -6,6 +6,8 @@ import { registerCloudfrontMappings } from "./services/cloudfront.js";
 import { registerCognitoMappings } from "./services/cognito.js";
 import { registerDynamoDBMappings } from "./services/dynamodb.js";
 import { registerEC2VPCMappings } from "./services/ec2-vpc.js";
+import { registerEcsMappings } from "./services/ecs.js";
+import { registerELBv2Mappings } from "./services/elbv2.js";
 import { registerEventsMappings } from "./services/events.js";
 import { registerIamMappings } from "./services/iam.js";
 import { registerLambdaMappings } from "./services/lambda.js";
@@ -16,8 +18,6 @@ import { registerSnsMappings } from "./services/sns.js";
 import { registerSqsMappings } from "./services/sqs.js";
 import { registerStepFunctinMappings } from "./services/stepfunctions.js";
 import { registerMapping } from "./utils.js";
-import { registerELBv2Mappings } from "./services/elbv2.js";
-
 export function registerMappings() {
     registerMapping("AWS::CloudFormation::CustomResource", {
         resource: (scope, id) => {
@@ -42,7 +42,7 @@ export function registerMappings() {
     registerSqsMappings();
     registerSnsMappings();
     registerStepFunctinMappings();
-    // registerEcsMappings();
+    registerEcsMappings();
     registerParameterMappings();
     registerELBv2Mappings();
 }

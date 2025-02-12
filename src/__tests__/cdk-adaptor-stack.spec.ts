@@ -5,6 +5,8 @@ import { AwsProvider } from "@cdktf/provider-aws/lib/provider/index.js";
 import { S3BucketPolicy } from "@cdktf/provider-aws/lib/s3-bucket-policy/index.js";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket/index.js";
 import { S3Object } from "@cdktf/provider-aws/lib/s3-object/index.js";
+import { InstanceClass, InstanceSize, InstanceType, NatGatewayProvider, Vpc } from "aws-cdk-lib/aws-ec2";
+import { ContainerImage, FargateTaskDefinition } from "aws-cdk-lib/aws-ecs";
 import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { Code, Function, Runtime } from "aws-cdk-lib/aws-lambda";
 import { Bucket, CfnBucketPolicy } from "aws-cdk-lib/aws-s3";
@@ -18,9 +20,6 @@ import { AwsTerraformAdaptorStack } from "../lib/core/cdk-adaptor-stack.js";
 import { ImplicitDependencyAspect } from "../mappings/implicit-dependency-aspect.js";
 import { registerMappings } from "../mappings/index.js";
 import { resourceMappings } from "../mappings/utils.js";
-import { InstanceClass, InstanceSize, InstanceType, NatGatewayProvider, Vpc } from "aws-cdk-lib/aws-ec2";
-import { Compatibility, ContainerImage, FargateTaskDefinition, TaskDefinition } from "aws-cdk-lib/aws-ecs";
-import { DockerImageAsset } from "aws-cdk-lib/aws-ecr-assets";
 
 setupJest();
 
@@ -224,11 +223,11 @@ describe("Stack synthesis", () => {
                 region: "us-east-1",
                 useCloudControlFallback: true,
             });
-            const vpc = new Vpc(stack, "vpc", {
+            new Vpc(stack, "vpc", {
                 maxAzs: 3,
                 natGatewayProvider: NatGatewayProvider.instanceV2({
                     instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.MICRO),
-                })
+                }),
             });
 
             stack.prepareStack();
@@ -637,7 +636,7 @@ describe("Stack synthesis", () => {
             region: "us-east-1",
             useCloudControlFallback: true,
         });
-        
+
         const task = new FargateTaskDefinition(testStack, "test-task", {
             family: "test-task",
             cpu: 256,
@@ -645,7 +644,7 @@ describe("Stack synthesis", () => {
             executionRole: new Role(testStack, "test-execution-role", {
                 assumedBy: new ServicePrincipal("ecs-tasks.amazonaws.com"),
             }),
-        })
+        });
 
         task.addContainer("test-container", {
             image: ContainerImage.fromAsset(path.join(dirname, "test-app"), {

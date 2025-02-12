@@ -2,6 +2,7 @@ import { CfnResource, IResolvable } from "aws-cdk-lib";
 import { CfnDistribution } from "aws-cdk-lib/aws-cloudfront";
 import { CfnIdentityPoolRoleAttachment, CfnUserPool, type CfnUserPoolProps } from "aws-cdk-lib/aws-cognito";
 import { CfnTable } from "aws-cdk-lib/aws-dynamodb";
+import type { CfnService, CfnServiceProps, CfnTaskDefinition } from "aws-cdk-lib/aws-ecs";
 import { CfnRule } from "aws-cdk-lib/aws-events";
 import { CfnEventSourceMapping, CfnEventSourceMappingProps, CfnPermissionProps } from "aws-cdk-lib/aws-lambda";
 import { CfnRecordSet } from "aws-cdk-lib/aws-route53";
@@ -87,6 +88,29 @@ type HandleSpecialObjectCases<T> = T extends Exact<CfnIdentityPoolRoleAttachment
         }>
     : T extends Exact<CfnUserPoolProps, T> ? ManualPropertyRemap<CfnUserPoolProps, {
             "webAuthnRelyingPartyId": "WebAuthnRelyingPartyID";
+        }>
+    : T extends Exact<CfnServiceProps, T> ? ManualPropertyRemap<CfnServiceProps, {
+            "enableEcsManagedTags": "EnableECSManagedTags";
+        }>
+    : T extends Exact<CfnService.ServiceConnectClientAliasProperty, T>
+        ? ManualPropertyRemap<CfnService.ServiceConnectClientAliasProperty, {
+            "dnsName": "DnsName";
+        }>
+    : T extends Exact<CfnService.ServiceConnectTlsConfigurationProperty, T>
+        ? ManualPropertyRemap<CfnService.ServiceConnectTlsConfigurationProperty, {
+            "kmsKey": "KmsKey";
+            "roleArn": "RoleArn";
+        }>
+    : T extends Exact<CfnService.ServiceVolumeConfigurationProperty, T>
+        ? ManualPropertyRemap<CfnService.ServiceVolumeConfigurationProperty, {
+            "managedEbsVolume": "ManagedEBSVolume";
+        }>
+    : T extends Exact<CfnTaskDefinition.VolumeProperty, T> ? ManualPropertyRemap<CfnTaskDefinition.VolumeProperty, {
+            "efsVolumeConfiguration": "EFSVolumeConfiguration";
+        }>
+    : T extends Exact<CfnTaskDefinition.AuthorizationConfigProperty, T>
+        ? ManualPropertyRemap<CfnTaskDefinition.AuthorizationConfigProperty, {
+            "iam": "IAM";
         }>
     : never;
 

@@ -1,4 +1,5 @@
 import { CloudwatchLogGroup, CloudwatchLogGroupConfig } from "@cdktf/provider-aws/lib/cloudwatch-log-group/index.js";
+import { CloudwatchLogIndexPolicy } from "@cdktf/provider-aws/lib/cloudwatch-log-index-policy/index.js";
 import {
     CloudwatchLogResourcePolicy,
     CloudwatchLogResourcePolicyConfig,
@@ -7,7 +8,6 @@ import { CfnLogGroup, CfnResourcePolicy } from "aws-cdk-lib/aws-logs";
 import { Fn, type TerraformResource, TerraformStack } from "cdktf";
 import { ImplicitDependencyAspect } from "../implicit-dependency-aspect.js";
 import { deleteUndefinedKeys, registerMapping, registerMappingTyped } from "../utils.js";
-import { CloudwatchLogIndexPolicy } from "@cdktf/provider-aws/lib/cloudwatch-log-index-policy/index.js";
 
 interface LogRetentionProps {
     ServiceToken: string;
@@ -106,3 +106,4 @@ export function registerLogMappings() {
         },
     });
 }
+3;

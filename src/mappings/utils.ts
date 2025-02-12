@@ -2,7 +2,7 @@
 
 import { CloudcontrolapiResource } from "@cdktf/provider-aws/lib/cloudcontrolapi-resource/index.js";
 import { CfnResource, IResolvable } from "aws-cdk-lib";
-import { Fn, TerraformResource, type TerraformElement } from "cdktf";
+import { Fn, type TerraformElement, TerraformResource } from "cdktf";
 import { propertyAccess } from "cdktf/lib/tfExpression.js";
 import { Construct } from "constructs";
 import supportedAwsccResourceTypes from "../lib/core/awscc/supported-types.js";

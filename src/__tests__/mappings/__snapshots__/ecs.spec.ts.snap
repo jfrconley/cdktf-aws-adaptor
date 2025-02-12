@@ -1,0 +1,422 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ECS mappings > Should map AWS::ECS::Cluster 1`] = `
+"{
+  "provider": {
+    "aws": [
+      {
+        "alias": "us_east_1",
+        "region": "us-east-1"
+      }
+    ]
+  },
+  "resource": {
+    "aws_ecs_cluster": {
+      "resource_22C949BF": {
+        "configuration": {
+          "execute_command_configuration": {
+            "kms_key_id": "test-kms-key-id",
+            "log_configuration": {
+              "cloud_watch_encryption_enabled": true,
+              "cloud_watch_log_group_name": "test-log-group",
+              "s3_bucket_encryption_enabled": true,
+              "s3_bucket_name": "test-bucket",
+              "s3_key_prefix": "test-prefix"
+            },
+            "logging": "DEFAULT"
+          },
+          "managed_storage_configuration": {
+            "fargate_ephemeral_storage_kms_key_id": "test-fargate-kms-key-id",
+            "kms_key_id": "test-kms-key-id"
+          }
+        },
+        "name": "test-cluster",
+        "service_connect_defaults": {
+          "namespace": "test-namespace"
+        },
+        "setting": [
+          {
+            "name": "containerInsights",
+            "value": "enabled"
+          }
+        ],
+        "tags": {
+          "test-tag-key": "test-tag-value"
+        }
+      }
+    },
+    "aws_ecs_cluster_capacity_providers": {
+      "resource_resource-capacity-providers_00D4E0EA": {
+        "capacity_providers": [
+          "FARGATE",
+          "FARGATE_SPOT"
+        ],
+        "cluster_name": "\${aws_ecs_cluster.resource_22C949BF.name}",
+        "default_capacity_provider_strategy": [
+          {
+            "base": 1,
+            "capacity_provider": "FARGATE",
+            "weight": 1
+          }
+        ]
+      }
+    }
+  },
+  "terraform": {
+    "backend": {
+      "local": {
+        "path": "/terraform.test-stack.tfstate"
+      }
+    },
+    "required_providers": {
+      "aws": {
+        "source": "aws",
+        "version": "5.85.0"
+      }
+    }
+  },
+  "variable": {
+    "resource_refs_CDA17697": {
+      "default": "\${aws_ecs_cluster.resource_22C949BF.arn}",
+      "type": "string"
+    }
+  }
+}"
+`;
+
+exports[`ECS mappings > Should map AWS::ECS::Service 1`] = `
+"{
+  "data": {
+    "aws_ecs_task_definition": {
+      "resource_resource-task-definition_FCE63DB8": {
+        "task_definition": "test-task-definition"
+      }
+    }
+  },
+  "provider": {
+    "aws": [
+      {
+        "alias": "us_east_1",
+        "region": "us-east-1"
+      }
+    ]
+  },
+  "resource": {
+    "aws_ecs_service": {
+      "resource_22C949BF": {
+        "alarms": {
+          "alarm_names": [
+            "test-alarm"
+          ],
+          "enable": true,
+          "rollback": true
+        },
+        "availability_zone_rebalancing": "ENABLED",
+        "capacity_provider_strategy": [
+          {
+            "base": 1,
+            "capacity_provider": "test-provider",
+            "weight": 100
+          }
+        ],
+        "cluster": "test-cluster",
+        "deployment_circuit_breaker": {
+          "enable": true,
+          "rollback": true
+        },
+        "deployment_controller": {
+          "type": "ECS"
+        },
+        "deployment_maximum_percent": 200,
+        "deployment_minimum_healthy_percent": 50,
+        "desired_count": 2,
+        "enable_ecs_managed_tags": true,
+        "enable_execute_command": true,
+        "health_check_grace_period_seconds": 60,
+        "iam_role": "test-role",
+        "launch_type": "FARGATE",
+        "load_balancer": [
+          {
+            "container_name": "test-container",
+            "container_port": 80,
+            "elb_name": "test-lb",
+            "target_group_arn": "test-target-group"
+          }
+        ],
+        "name": "test-service",
+        "network_configuration": {
+          "assign_public_ip": true,
+          "security_groups": [
+            "sg-1",
+            "sg-2"
+          ],
+          "subnets": [
+            "subnet-1",
+            "subnet-2"
+          ]
+        },
+        "ordered_placement_strategy": [
+          {
+            "field": "attribute:ecs.availability-zone",
+            "type": "spread"
+          }
+        ],
+        "placement_constraints": [
+          {
+            "expression": "attribute:ecs.instance-type =~ t3.*",
+            "type": "memberOf"
+          }
+        ],
+        "platform_version": "LATEST",
+        "propagate_tags": "SERVICE",
+        "scheduling_strategy": "REPLICA",
+        "service_connect_configuration": {
+          "enabled": true,
+          "log_configuration": {
+            "log_driver": "awslogs",
+            "options": {
+              "awslogs-group": "test-group"
+            },
+            "secret_option": [
+              {
+                "name": "test-secret",
+                "value_from": "test-secret-arn"
+              }
+            ]
+          },
+          "namespace": "test-namespace",
+          "service": [
+            {
+              "client_alias": {
+                "dns_name": "test-dns",
+                "port": 80
+              },
+              "discovery_name": "test-discovery",
+              "ingress_port_override": 8080,
+              "port_name": "test-port",
+              "timeout": {
+                "idle_timeout_seconds": 60,
+                "per_request_timeout_seconds": 60
+              },
+              "tls": {
+                "issuer_cert_authority": {
+                  "aws_pca_authority_arn": "test-aws-pca-authority-arn"
+                },
+                "kms_key": "test-kms-key",
+                "role_arn": "test-role-arn"
+              }
+            }
+          ]
+        },
+        "service_registries": {
+          "container_name": "test-container",
+          "container_port": 80,
+          "port": 80,
+          "registry_arn": "test-registry"
+        },
+        "tags": {
+          "test-tag-key": "test-tag-value"
+        },
+        "task_definition": "\${data.aws_ecs_task_definition.resource_resource-task-definition_FCE63DB8.arn}",
+        "volume_configuration": {
+          "managed_ebs_volume": {
+            "encrypted": true,
+            "file_system_type": "ext4",
+            "iops": 3000,
+            "kms_key_id": "test-kms-key-id",
+            "role_arn": "test-role-arn",
+            "size_in_gb": 20,
+            "snapshot_id": "test-snapshot",
+            "tag_specifications": [
+              {
+                "propagate_tags": "SERVICE",
+                "resource_type": "volume",
+                "tags": {
+                  "test-volume-tag-key": "test-volume-tag-value"
+                }
+              }
+            ],
+            "throughput": 125,
+            "volume_type": "gp3"
+          },
+          "name": "test-volume"
+        },
+        "vpc_lattice_configurations": [
+          {
+            "port_name": "test-port",
+            "role_arn": "test-role-arn",
+            "target_group_arn": "test-target-group-arn"
+          }
+        ],
+        "wait_for_steady_state": true
+      }
+    }
+  },
+  "terraform": {
+    "backend": {
+      "local": {
+        "path": "/terraform.test-stack.tfstate"
+      }
+    },
+    "required_providers": {
+      "aws": {
+        "source": "aws",
+        "version": "5.85.0"
+      }
+    }
+  },
+  "variable": {
+    "resource_refs_CDA17697": {
+      "default": "\${join(\\"\\", [aws_ecs_service.resource_22C949BF.name, \\",\\", aws_ecs_service.resource_22C949BF.id])}",
+      "type": "string"
+    }
+  }
+}"
+`;
+
+exports[`ECS mappings > Should map AWS::ECS::TaskDefinition 1`] = `
+"{
+  "provider": {
+    "aws": [
+      {
+        "alias": "us_east_1",
+        "region": "us-east-1"
+      }
+    ]
+  },
+  "resource": {
+    "aws_ecs_task_definition": {
+      "resource_22C949BF": {
+        "container_definitions": "\${jsonencode([{\\"Cpu\\" = 256, \\"DisableNetworking\\" = false, \\"Environment\\" = [{\\"Name\\" = \\"ENV\\", \\"Value\\" = \\"prod\\"}], \\"Essential\\" = true, \\"FirelensConfiguration\\" = {\\"Type\\" = \\"fluentbit\\"}, \\"HealthCheck\\" = {\\"Interval\\" = 0, \\"Retries\\" = 0, \\"StartPeriod\\" = 0, \\"Timeout\\" = 0}, \\"Hostname\\" = \\"\\", \\"Image\\" = \\"nginx:latest\\", \\"Interactive\\" = false, \\"LinuxParameters\\" = {\\"Capabilities\\" = {}, \\"InitProcessEnabled\\" = false, \\"MaxSwap\\" = 0, \\"SharedMemorySize\\" = 0, \\"Swappiness\\" = 0}, \\"LogConfiguration\\" = {\\"LogDriver\\" = \\"awslogs\\", \\"Options\\" = {\\"awslogs-group\\" = \\"test-log-group\\", \\"awslogs-region\\" = \\"us-east-1\\", \\"awslogs-stream-prefix\\" = \\"web\\"}}, \\"Memory\\" = 512, \\"MemoryReservation\\" = 256, \\"MountPoints\\" = [{\\"ContainerPath\\" = \\"/usr/share/nginx/html\\", \\"ReadOnly\\" = true, \\"SourceVolume\\" = \\"efs-volume\\"}], \\"Name\\" = \\"web\\", \\"PortMappings\\" = [{\\"AppProtocol\\" = \\"http\\", \\"ContainerPort\\" = 80, \\"ContainerPortRange\\" = \\"\\", \\"HostPort\\" = 80, \\"Name\\" = \\"web\\", \\"Protocol\\" = \\"tcp\\"}], \\"Privileged\\" = false, \\"PseudoTerminal\\" = false, \\"ReadonlyRootFilesystem\\" = false, \\"RepositoryCredentials\\" = {\\"CredentialsParameter\\" = \\"\\"}, \\"RestartPolicy\\" = {\\"Enabled\\" = true, \\"IgnoredExitCodes\\" = [4], \\"RestartAttemptPeriod\\" = 0}, \\"StartTimeout\\" = 0, \\"StopTimeout\\" = 0, \\"User\\" = \\"\\", \\"VersionConsistency\\" = \\"DEFAULT\\", \\"WorkingDirectory\\" = \\"\\"}])}",
+        "cpu": "256",
+        "enable_fault_injection": true,
+        "ephemeral_storage": {
+          "size_in_gib": 50
+        },
+        "execution_role_arn": "arn:aws:iam::123456789012:role/ecsTaskExecutionRole",
+        "family": "test-task-definition",
+        "ipc_mode": "host",
+        "memory": "512",
+        "network_mode": "awsvpc",
+        "pid_mode": "host",
+        "placement_constraints": [
+          {
+            "expression": "attribute:ecs.instance-type =~ t3.*",
+            "type": "memberOf"
+          }
+        ],
+        "proxy_configuration": {
+          "container_name": "envoy",
+          "properties": {
+            "ProxyEgressPort": "15001",
+            "ProxyIngressPort": "15000"
+          },
+          "type": "APPMESH"
+        },
+        "requires_compatibilities": [
+          "FARGATE"
+        ],
+        "runtime_platform": {
+          "cpu_architecture": "X86_64",
+          "operating_system_family": "LINUX"
+        },
+        "tags": {
+          "Environment": "Production"
+        },
+        "task_role_arn": "arn:aws:iam::123456789012:role/ecsTaskRole",
+        "volume": [
+          {
+            "configure_at_launch": false,
+            "docker_volume_configuration": {
+              "autoprovision": false,
+              "driver": "",
+              "driver_opts": {
+                "device": ":/test",
+                "type": "nfs"
+              },
+              "labels": {
+                "environment": "test"
+              },
+              "scope": "shared"
+            },
+            "efs_volume_configuration": {
+              "authorization_config": {
+                "access_point_id": "fsap-12345678",
+                "iam": "ENABLED"
+              },
+              "file_system_id": "fs-12345678",
+              "root_directory": "/",
+              "transit_encryption": "ENABLED",
+              "transit_encryption_port": 2049
+            },
+            "fsx_windows_file_server_volume_configuration": {
+              "authorization_config": {
+                "credentials_parameter": "",
+                "domain": ""
+              },
+              "file_system_id": "",
+              "root_directory": ""
+            },
+            "host_path": "",
+            "name": "efs-volume"
+          },
+          {
+            "configure_at_launch": false,
+            "docker_volume_configuration": {
+              "autoprovision": true,
+              "driver": "local",
+              "driver_opts": {
+                "device": ":/test",
+                "type": "nfs"
+              },
+              "labels": {
+                "environment": "test"
+              },
+              "scope": "shared"
+            },
+            "efs_volume_configuration": {
+              "authorization_config": {
+                "access_point_id": "",
+                "iam": "ENABLED"
+              },
+              "file_system_id": "",
+              "root_directory": "",
+              "transit_encryption": "ENABLED",
+              "transit_encryption_port": 2049
+            },
+            "fsx_windows_file_server_volume_configuration": {
+              "authorization_config": {
+                "credentials_parameter": "",
+                "domain": ""
+              },
+              "file_system_id": "",
+              "root_directory": ""
+            },
+            "host_path": "",
+            "name": "docker-volume"
+          }
+        ]
+      }
+    }
+  },
+  "terraform": {
+    "backend": {
+      "local": {
+        "path": "/terraform.test-stack.tfstate"
+      }
+    },
+    "required_providers": {
+      "aws": {
+        "source": "aws",
+        "version": "5.85.0"
+      }
+    }
+  },
+  "variable": {
+    "resource_refs_CDA17697": {
+      "default": "\${aws_ecs_task_definition.resource_22C949BF.arn}",
+      "type": "string"
+    }
+  }
+}"
+`;

@@ -5,7 +5,6 @@ import { DataAwsCallerIdentity } from "@cdktf/provider-aws/lib/data-aws-caller-i
 import { DataAwsPartition } from "@cdktf/provider-aws/lib/data-aws-partition/index.js";
 import { DataAwsRegion } from "@cdktf/provider-aws/lib/data-aws-region/index.js";
 import { AwsProvider } from "@cdktf/provider-aws/lib/provider/index.js";
-import debug from "debug";
 import {
     CfnElement,
     CfnResource,
@@ -13,7 +12,6 @@ import {
     Stack as AWSStack,
     Stage as AWSStage,
     Token as AWSToken,
-    type CfnParameter,
 } from "aws-cdk-lib";
 import {
     App,
@@ -37,12 +35,18 @@ import { conditional, propertyAccess } from "cdktf/lib/tfExpression.js";
 import { TokenMap } from "cdktf/lib/tokens/private/token-map.js";
 import { toSnakeCase } from "codemaker";
 import { Construct, ConstructOrder, IConstruct } from "constructs";
+import debug from "debug";
 import { AccessTracker } from "../../mappings/access-tracker.js";
+import { findParameterMapping } from "../../mappings/parameters/parameters.js";
 import { findMapping, Mapping } from "../../mappings/utils.js";
-import { CloudFormationOutput, CloudFormationResource, CloudFormationTemplate, type CloudFormationParameter } from "./cfn.js";
+import {
+    CloudFormationOutput,
+    type CloudFormationParameter,
+    CloudFormationResource,
+    CloudFormationTemplate,
+} from "./cfn.js";
 import { reparentConstruct } from "./construct-helpers.js";
 import { TerraformSynthesizer } from "./terraform-synthesizer.js";
-import { findParameterMapping } from "../../mappings/parameters/parameters.js";
 
 function getAwsCDKTokenResolutionCompat() {
     const originalUnresolved = AWSToken.isUnresolved;
@@ -366,7 +370,9 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
             );
         }
         for (const [logicalId, resource] of resources) {
-            AwsTerraformAdaptorStack.adaptorDebug(`Creating Terraform resource for logical ID: ${logicalId}, type: ${resource.Type}`);
+            AwsTerraformAdaptorStack.adaptorDebug(
+                `Creating Terraform resource for logical ID: ${logicalId}, type: ${resource.Type}`,
+            );
             this.newTerraformResource(element, logicalId, resource);
         }
     }
@@ -444,8 +450,12 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
         return this.awsAvailabilityZones[region];
     }
 
-    private newTerraformVariable(currentElement: CfnElement, logicalId: string, props: CloudFormationParameter): TerraformVariable {
-        const m = findParameterMapping(props.Type)
+    private newTerraformVariable(
+        currentElement: CfnElement,
+        logicalId: string,
+        props: CloudFormationParameter,
+    ): TerraformVariable {
+        const m = findParameterMapping(props.Type);
         if (!m) {
             throw new Error(`no mapping for ${props.Type}`);
         }
@@ -454,7 +464,7 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
         const newScope = terraformStack == undefined ? this : currentElement.node.scope as Construct;
         const proxy = new AccessTracker(props);
 
-        const resolvedProps = this.processIntrinsics(props)
+        const resolvedProps = this.processIntrinsics(props);
 
         const res = m.resource(newScope, currentElement.node.id, resolvedProps, proxy);
         if (!res) {
@@ -675,7 +685,9 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
         if (!mapping) {
             // Don't be infinitely lazy
             if (isLazy) {
-                AwsTerraformAdaptorStack.adaptorDebug(`Failed to resolve attribute ${attribute} for logical ID: ${logicalId}`);
+                AwsTerraformAdaptorStack.adaptorDebug(
+                    `Failed to resolve attribute ${attribute} for logical ID: ${logicalId}`,
+                );
                 throw new Error(
                     `unable to resolve a "Ref" to a resource with the logical ID ${logicalId}`,
                 );
@@ -819,7 +831,6 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
             }
 
             case "Fn::Sub": {
-
                 const pseudoReplacementMap = {
                     "AWS::AccountId": this.awsCallerIdentity.accountId,
                     "AWS::Region": this.awsRegion.name,

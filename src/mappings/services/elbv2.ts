@@ -1,29 +1,7 @@
-import {
-    Lb,
-    LbConfig,
-} from "@cdktf/provider-aws/lib/lb/index.js";
-import {
-    LbListener,
-    LbListenerConfig,
-    LbListenerDefaultAction,
-} from "@cdktf/provider-aws/lib/lb-listener/index.js";
-import {
-    LbListenerRule,
-    LbListenerRuleConfig,
-    LbListenerRuleAction,
-    LbListenerRuleCondition,
-} from "@cdktf/provider-aws/lib/lb-listener-rule/index.js";
-import {
-    LbTargetGroup,
-    LbTargetGroupConfig,
-} from "@cdktf/provider-aws/lib/lb-target-group/index.js";
+import { Lb, LbConfig } from "@cdktf/provider-aws/lib/lb/index.js";
 import { Names } from "aws-cdk-lib";
-import {
-    CfnListener,
-    CfnListenerRule,
-    CfnLoadBalancer,
-    CfnTargetGroup,
-} from "aws-cdk-lib/aws-elasticloadbalancingv2";
+import { CfnLoadBalancer } from "aws-cdk-lib/aws-elasticloadbalancingv2";
+import type { Writeable } from "../../lib/core/type-utils.js";
 import { deleteUndefinedKeys, registerMappingTyped } from "../utils.js";
 
 export function registerELBv2Mappings() {
@@ -32,7 +10,7 @@ export function registerELBv2Mappings() {
             if (!props) {
                 throw new Error("Properties are required for LoadBalancer");
             }
-            const mapped: LbConfig = {
+            const mapped: Writeable<LbConfig> = {
                 name: props.Name || Names.uniqueResourceName(scope, { maxLength: 32 }),
                 internal: props.Scheme === "internal",
                 loadBalancerType: props.Type as string,
@@ -43,63 +21,63 @@ export function registerELBv2Mappings() {
 
             // Only add attributes if they are explicitly set
             const dropInvalidHeaderFields = props.LoadBalancerAttributes?.find(
-                attr => attr.Key === "routing.http.drop_invalid_header_fields.enabled"
+                attr => attr.Key === "routing.http.drop_invalid_header_fields.enabled",
             )?.Value;
             if (dropInvalidHeaderFields !== undefined) {
-                (mapped as any).dropInvalidHeaderFields = dropInvalidHeaderFields === "true";
+                (mapped).dropInvalidHeaderFields = dropInvalidHeaderFields === "true";
             }
 
             const crossZone = props.LoadBalancerAttributes?.find(
-                attr => attr.Key === "load_balancing.cross_zone.enabled"
+                attr => attr.Key === "load_balancing.cross_zone.enabled",
             )?.Value;
             if (crossZone !== undefined) {
-                (mapped as any).enableCrossZoneLoadBalancing = crossZone === "true";
+                (mapped).enableCrossZoneLoadBalancing = crossZone === "true";
             }
 
             const deletionProtection = props.LoadBalancerAttributes?.find(
-                attr => attr.Key === "deletion_protection.enabled"
+                attr => attr.Key === "deletion_protection.enabled",
             )?.Value;
             if (deletionProtection !== undefined) {
-                (mapped as any).enableDeletionProtection = deletionProtection === "true";
+                (mapped).enableDeletionProtection = deletionProtection === "true";
             }
 
             const http2 = props.LoadBalancerAttributes?.find(
-                attr => attr.Key === "routing.http2.enabled"
+                attr => attr.Key === "routing.http2.enabled",
             )?.Value;
             if (http2 !== undefined) {
-                (mapped as any).enableHttp2 = http2 === "true";
+                (mapped).enableHttp2 = http2 === "true";
             }
 
             const wafFailOpen = props.LoadBalancerAttributes?.find(
-                attr => attr.Key === "waf.fail_open.enabled"
+                attr => attr.Key === "waf.fail_open.enabled",
             )?.Value;
             if (wafFailOpen !== undefined) {
-                (mapped as any).enableWafFailOpen = wafFailOpen === "true";
+                (mapped).enableWafFailOpen = wafFailOpen === "true";
             }
 
             const idleTimeout = props.LoadBalancerAttributes?.find(
-                attr => attr.Key === "idle_timeout.timeout_seconds"
+                attr => attr.Key === "idle_timeout.timeout_seconds",
             )?.Value;
             if (idleTimeout !== undefined) {
-                (mapped as any).idleTimeout = parseInt(idleTimeout);
+                (mapped).idleTimeout = parseInt(idleTimeout);
             }
 
             const preserveHostHeader = props.LoadBalancerAttributes?.find(
-                attr => attr.Key === "routing.http.preserve_host_header.enabled"
+                attr => attr.Key === "routing.http.preserve_host_header.enabled",
             )?.Value;
             if (preserveHostHeader !== undefined) {
-                (mapped as any).preserveHostHeader = preserveHostHeader === "true";
+                (mapped).preserveHostHeader = preserveHostHeader === "true";
             }
 
             if (props.Tags) {
-                (mapped as any).tags = Object.fromEntries(props.Tags.map(({ Key, Value }) => [Key, Value]));
+                (mapped).tags = Object.fromEntries(props.Tags.map(({ Key, Value }) => [Key, Value]));
             }
 
             const xffHeaderProcessingMode = props.LoadBalancerAttributes?.find(
-                attr => attr.Key === "routing.http.xff_header_processing.mode"
+                attr => attr.Key === "routing.http.xff_header_processing.mode",
             )?.Value;
             if (xffHeaderProcessingMode !== undefined) {
-                (mapped as any).xffHeaderProcessingMode = xffHeaderProcessingMode;
+                (mapped).xffHeaderProcessingMode = xffHeaderProcessingMode;
             }
 
             return new Lb(scope, id, deleteUndefinedKeys(mapped));
@@ -138,7 +116,7 @@ export function registerELBv2Mappings() {
     //                     onUnauthenticatedRequest: action.AuthenticateCognitoConfig.OnUnauthenticatedRequest as string,
     //                     scope: action.AuthenticateCognitoConfig.Scope as string,
     //                     sessionCookieName: action.AuthenticateCognitoConfig.SessionCookieName as string,
-    //                     sessionTimeout: action.AuthenticateCognitoConfig.SessionTimeout ? 
+    //                     sessionTimeout: action.AuthenticateCognitoConfig.SessionTimeout ?
     //                         Number(action.AuthenticateCognitoConfig.SessionTimeout) : undefined,
     //                 },
     //                 authenticateOidc: action.AuthenticateOidcConfig && {
@@ -152,7 +130,7 @@ export function registerELBv2Mappings() {
     //                     onUnauthenticatedRequest: action.AuthenticateOidcConfig.OnUnauthenticatedRequest as string,
     //                     scope: action.AuthenticateOidcConfig.Scope as string,
     //                     sessionCookieName: action.AuthenticateOidcConfig.SessionCookieName as string,
-    //                     sessionTimeout: action.AuthenticateOidcConfig.SessionTimeout ? 
+    //                     sessionTimeout: action.AuthenticateOidcConfig.SessionTimeout ?
     //                         Number(action.AuthenticateOidcConfig.SessionTimeout) : undefined,
     //                 },
     //                 fixedResponse: action.FixedResponseConfig && {
@@ -209,7 +187,7 @@ export function registerELBv2Mappings() {
     //                     onUnauthenticatedRequest: action.AuthenticateCognitoConfig.OnUnauthenticatedRequest as string,
     //                     scope: action.AuthenticateCognitoConfig.Scope as string,
     //                     sessionCookieName: action.AuthenticateCognitoConfig.SessionCookieName as string,
-    //                     sessionTimeout: action.AuthenticateCognitoConfig.SessionTimeout ? 
+    //                     sessionTimeout: action.AuthenticateCognitoConfig.SessionTimeout ?
     //                         Number(action.AuthenticateCognitoConfig.SessionTimeout) : undefined,
     //                 },
     //                 authenticateOidc: action.AuthenticateOidcConfig && {
@@ -223,7 +201,7 @@ export function registerELBv2Mappings() {
     //                     onUnauthenticatedRequest: action.AuthenticateOidcConfig.OnUnauthenticatedRequest as string,
     //                     scope: action.AuthenticateOidcConfig.Scope as string,
     //                     sessionCookieName: action.AuthenticateOidcConfig.SessionCookieName as string,
-    //                     sessionTimeout: action.AuthenticateOidcConfig.SessionTimeout ? 
+    //                     sessionTimeout: action.AuthenticateOidcConfig.SessionTimeout ?
     //                         Number(action.AuthenticateOidcConfig.SessionTimeout) : undefined,
     //                 },
     //                 fixedResponse: action.FixedResponseConfig && {
@@ -361,4 +339,4 @@ export function registerELBv2Mappings() {
     //         Ref: (tg: LbTargetGroup) => tg.id,
     //     },
     // });
-} 
+}
