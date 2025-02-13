@@ -232,8 +232,7 @@ describe("Stack synthesis", () => {
 
             stack.prepareStack();
 
-            const synthed = Testing.synth(stack);
-            console.log(synthed);
+            Testing.synth(stack);
 
             // expect(synthed).toHaveResourceWithProperties(Vpc, {
             //     nat_gateway_provider: "Instance",
@@ -654,8 +653,6 @@ describe("Stack synthesis", () => {
         });
 
         testStack.prepareStack();
-        const synthesized = Testing.synth(testStack);
-
-        console.log(synthesized);
+        // const synthesized = Testing.synth(testStack);
     });
 });
