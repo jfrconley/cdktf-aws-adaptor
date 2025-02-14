@@ -39,6 +39,7 @@ import debug from "debug";
 import { AccessTracker } from "../../mappings/access-tracker.js";
 import { findParameterMapping } from "../../mappings/parameters/parameters.js";
 import { findMapping, Mapping } from "../../mappings/utils.js";
+import { CdkAdaptorBackend } from "../bootstrap/adaptor-backend.js";
 import {
     CloudFormationOutput,
     type CloudFormationParameter,
@@ -143,18 +144,25 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
     }
 
     constructor(scope: Construct, id: string, region: string);
-    constructor(scope: Construct, id: string, props: { region?: string; useCloudControlFallback?: boolean });
+    constructor(scope: Construct, id: string, props: {
+        region?: string;
+        useCloudControlFallback?: boolean;
+        enableAdaptorBackend?: boolean;
+    });
     constructor(
         scope: Construct,
         id: string,
-        options: string | { region?: string; useCloudControlFallback?: boolean } = "us-east-1",
+        options: string | { region?: string; useCloudControlFallback?: boolean; enableAdaptorBackend?: boolean } =
+            "us-east-1",
     ) {
         const awsStage = new AWSStage(scope, `${id}-aws-stage`);
-        const props = typeof options === "string" ? { region: options, useCloudControlFallback: true } : {
-            region: "us-east-1",
-            useCloudControlFallback: true,
-            ...options,
-        };
+        const props = typeof options === "string"
+            ? { region: options, useCloudControlFallback: true, enableAdaptorBackend: true }
+            : {
+                region: "us-east-1",
+                useCloudControlFallback: true,
+                ...options,
+            };
         const awsSynthesizer = new TerraformSynthesizer();
         const awsCdkStack = new AWSStack(awsStage, `${id}-aws-stack`, {
             synthesizer: awsSynthesizer,
@@ -166,6 +174,9 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
         super(awsCdkStack, id);
         this.getRegionalAwsProvider(props.region);
         this.useCloudControlFallback = props.useCloudControlFallback;
+        if (props.enableAdaptorBackend) {
+            new CdkAdaptorBackend(this, props.region);
+        }
 
         awsSynthesizer.terraformStack = this;
         this.awsStage = awsStage;

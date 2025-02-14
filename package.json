@@ -5,6 +5,9 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "cdktf-bootstrap": "./dist/lib/bootstrap/cli.js"
+  },
   "keywords": [
     "typescript",
     "cdktf",
@@ -32,6 +35,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
+    },
+    "./bootstrap": {
+      "types": "./dist/lib/bootstrap/bootstrap.d.ts",
+      "import": "./dist/lib/bootstrap/bootstrap.js"
     }
   },
   "scripts": {
@@ -48,10 +55,11 @@
   "author": "John Conley",
   "license": "MIT",
   "devDependencies": {
-    "@aws-sdk/client-cloudformation": "^3.741.0",
+
     "@cdktf/provider-aws": "^19.51.0",
     "@changesets/cli": "^2.27.12",
     "@eslint/js": "^9.19.0",
+    "@smithy/types": "^4.1.0",
     "@types/debug": "^4.1.12",
     "@types/node": "^22.13.1",
     "@typescript-eslint/eslint-plugin": "^8.23.0",
@@ -75,12 +83,14 @@
     "constructs": "^10.4.2"
   },
   "dependencies": {
+    "@aws-sdk/client-cloudformation": "^3.741.0",
     "@cdktf/provider-archive": "10.3.0",
     "@cdktf/provider-docker": "^11.0.0",
     "@cdktf/provider-null": "^10.0.1",
     "camel-case": "^5.0.0",
     "codemaker": "^1.106.0",
     "debug": "^4.4.0",
+    "lodash.get": "^4.4.2",
     "minimatch": "^10.0.1",
     "yargs": "^17.7.2"
   }
