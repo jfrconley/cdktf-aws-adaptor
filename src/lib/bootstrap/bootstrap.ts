@@ -42,7 +42,6 @@ const template = {
             Properties: {
                 KeySchema: [{ AttributeName: "LockID", KeyType: "HASH" }],
                 AttributeDefinitions: [{ AttributeName: "LockID", AttributeType: "S" }],
-                BillingMode: "PAY_PER_REQUEST",
             },
         },
     },
@@ -200,16 +199,14 @@ export function getBootstrapValues(): BoostrapValues {
 
         const outputs = Stacks[0].Outputs;
         if (!outputs) {
-            throw new BootstrapStackError(
-                `No outputs found for stack ${stackId}. The stack may be in an invalid state.`,
-            );
+            throw new Error(`No outputs found for stack ${stackId}. The stack may be in an invalid state.`);
         }
 
         const stateBucketName = outputs.find(o => o.OutputKey === "StateBucketName")?.OutputValue;
         const stateTableName = outputs.find(o => o.OutputKey === "StateTableName")?.OutputValue;
 
         if (!stateBucketName || !stateTableName) {
-            throw new BootstrapStackError("Required outputs not found in stack. The stack may be in an invalid state.");
+            throw new Error("Required outputs not found in stack. The stack may be in an invalid state.");
         }
 
         return {
@@ -229,8 +226,30 @@ export async function deleteBootstrapStack(): Promise<void> {
     const client = new CloudFormationClient({});
 
     try {
-        // First verify the stack exists
-        await client.send(new DescribeStacksCommand({ StackName: stackId }));
+        // Check stack state first
+        const state = await checkStackState(client);
+
+        if (state === "NOT_FOUND") {
+            throw new BootstrapNotFoundError();
+        }
+
+        // If stack is in DELETE_IN_PROGRESS, wait for it to complete
+        if (state === "DELETE_IN_PROGRESS") {
+            console.log("Stack deletion already in progress, waiting for completion...");
+            await waitUntilStackDeleteComplete(
+                { client, maxWaitTime: 300 },
+                { StackName: stackId },
+            );
+            console.log("Bootstrap stack deleted successfully");
+            return;
+        }
+
+        // For DELETE_FAILED, we need to abandon the stack first
+        if (state === "DELETE_FAILED") {
+            console.log("Previous deletion failed, retrying deletion...");
+        } else if (BAD_STATES.includes(state)) {
+            console.log(`Stack is in ${state} state, attempting forced deletion...`);
+        }
 
         // Delete the stack
         const command = new DeleteStackCommand({
@@ -238,16 +257,41 @@ export async function deleteBootstrapStack(): Promise<void> {
         });
 
         await client.send(command);
-        await waitUntilStackDeleteComplete(
-            { client, maxWaitTime: 300 },
-            { StackName: stackId },
-        );
 
-        console.log("Bootstrap stack deleted successfully");
+        // Wait for deletion to complete
+        try {
+            await waitUntilStackDeleteComplete(
+                { client, maxWaitTime: 300 },
+                { StackName: stackId },
+            );
+            console.log("Bootstrap stack deleted successfully");
+        } catch (waitErr) {
+            // If waiting fails, check if the stack actually exists
+            const finalState = await checkStackState(client);
+            if (finalState === "NOT_FOUND") {
+                console.log("Bootstrap stack deleted successfully");
+                return;
+            }
+            throw waitErr;
+        }
     } catch (err) {
         if (err instanceof Error && err.message.includes("does not exist")) {
             throw new BootstrapNotFoundError();
         }
+
+        // Handle rate limiting or throttling errors
+        if (
+            err instanceof Error && (
+                err.message.includes("Rate exceeded")
+                || err.message.includes("ThrottlingException")
+            )
+        ) {
+            console.log("AWS request throttled, retrying deletion...");
+            // Wait a bit and try again
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            return deleteBootstrapStack();
+        }
+
         throw err;
     }
 }

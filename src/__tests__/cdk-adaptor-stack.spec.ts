@@ -1,10 +1,13 @@
 import { AppsyncGraphqlApi } from "@cdktf/provider-aws/lib/appsync-graphql-api/index.js";
 import { CloudcontrolapiResource } from "@cdktf/provider-aws/lib/cloudcontrolapi-resource/index.js";
+import { EcrRepository } from "@cdktf/provider-aws/lib/ecr-repository/index.js";
 import { IamRole } from "@cdktf/provider-aws/lib/iam-role/index.js";
 import { AwsProvider } from "@cdktf/provider-aws/lib/provider/index.js";
 import { S3BucketPolicy } from "@cdktf/provider-aws/lib/s3-bucket-policy/index.js";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket/index.js";
 import { S3Object } from "@cdktf/provider-aws/lib/s3-object/index.js";
+import { Image } from "@cdktf/provider-docker/lib/image/index.js";
+import { RegistryImage } from "@cdktf/provider-docker/lib/registry-image/index.js";
 import { InstanceClass, InstanceSize, InstanceType, NatGatewayProvider, Vpc } from "aws-cdk-lib/aws-ec2";
 import { ContainerImage, FargateTaskDefinition } from "aws-cdk-lib/aws-ecs";
 import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
@@ -653,6 +656,24 @@ describe("Stack synthesis", () => {
         });
 
         testStack.prepareStack();
-        // const synthesized = Testing.synth(testStack);
+
+        const synthesized = Testing.synth(testStack);
+
+        // Verify that the ecr repo has been created
+        expect(synthesized).toHaveResourceWithProperties(EcrRepository, {
+            name: expect.stringContaining("image-assets"),
+        });
+
+        const namePattern = /\${join\(\"\", \[aws_ecr_repository.EcrRepository.repository_url, \":[a-z0-9]{64}\"\]\)}/;
+
+        // Verify that the image asset has been created
+        expect(synthesized).toHaveResourceWithProperties(Image, {
+            name: expect.stringMatching(namePattern),
+        });
+
+        // Verify that the repository image has been created
+        expect(synthesized).toHaveResourceWithProperties(RegistryImage, {
+            name: "${docker_image.DockerImagea419971900fbcd890fabf3f99502820d1a3dced62e956d02a2a57bb3af5f2584.name}",
+        });
     });
 });

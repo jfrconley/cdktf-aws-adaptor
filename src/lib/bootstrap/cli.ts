@@ -57,6 +57,8 @@ async function main() {
                 console.log("- State bucket:", values.stateBucketName);
                 console.log("- State table:", values.stateTableName);
                 console.log("\nProceeding with deletion...");
+
+                await deleteBootstrapStack();
             } catch (err) {
                 if (err instanceof BootstrapNotFoundError) {
                     console.error("\x1b[33m%s\x1b[0m", "Bootstrap stack does not exist, nothing to clean up.");
@@ -69,7 +71,6 @@ async function main() {
                 }
                 throw err;
             }
-            await deleteBootstrapStack();
         })
         .demandCommand(1, "You must specify a command")
         .strict()

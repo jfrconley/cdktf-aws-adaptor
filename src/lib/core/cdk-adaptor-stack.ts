@@ -157,7 +157,7 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
     ) {
         const awsStage = new AWSStage(scope, `${id}-aws-stage`);
         const props = typeof options === "string"
-            ? { region: options, useCloudControlFallback: true, enableAdaptorBackend: true }
+            ? { region: options, useCloudControlFallback: true, enableAdaptorBackend: false }
             : {
                 region: "us-east-1",
                 useCloudControlFallback: true,
@@ -175,7 +175,7 @@ export abstract class AwsTerraformAdaptorStack extends TerraformStack {
         this.getRegionalAwsProvider(props.region);
         this.useCloudControlFallback = props.useCloudControlFallback;
         if (props.enableAdaptorBackend) {
-            new CdkAdaptorBackend(this, props.region);
+            new CdkAdaptorBackend(this);
         }
 
         awsSynthesizer.terraformStack = this;
