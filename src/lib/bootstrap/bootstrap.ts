@@ -24,6 +24,7 @@ const BAD_STATES = [
     "UPDATE_ROLLBACK_FAILED",
     "UPDATE_ROLLBACK_COMPLETE",
     "DELETE_FAILED",
+    "DELETE_IN_PROGRESS",
 ];
 
 const template = {
