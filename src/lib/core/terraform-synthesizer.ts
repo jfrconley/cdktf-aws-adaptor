@@ -127,6 +127,7 @@ export class TerraformSynthesizer extends DefaultStackSynthesizer {
         let ecrRepository = this.terraformStack.node.tryFindChild("EcrRepository") as EcrRepository;
         if (!ecrRepository) {
             ecrRepository = new EcrRepository(this.terraformStack, "EcrRepository", {
+                forceDelete: true,
                 name: Names.uniqueResourceName(this.terraformStack, {
                     maxLength: 16,
                 }).toLowerCase() + "image-assets",
