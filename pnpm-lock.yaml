@@ -60,6 +60,9 @@ importers:
       '@types/node':
         specifier: ^22.13.1
         version: 22.13.1
+      '@types/yargs':
+        specifier: ^17.0.33
+        version: 17.0.33
       '@typescript-eslint/eslint-plugin':
         specifier: ^8.23.0
         version: 8.23.0(@typescript-eslint/parser@8.23.0(eslint@9.19.0)(typescript@5.7.3))(eslint@9.19.0)(typescript@5.7.3)
@@ -3103,8 +3106,8 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
-  typescript@5.9.0-dev.20250221:
-    resolution: {integrity: sha512-UFfThOO8QL+CETwfK5J8aYgM0ZD+yHZet+GMnxuv+S+LIMnRDmTChV3/b7FJ+Gt42uGOhT5z52q1fydXEP4OIA==}
+  typescript@5.9.0-dev.20250224:
+    resolution: {integrity: sha512-hE9YCxxyOJDBJhEo6w3veHldQw5ry0nhuTzaPU2UZe37YsBIC5kaOVdzeA+IUh4cgYWKe60B1vuC4GN8Q4a0SA==}
     engines: {node: '>=14.17'}
     hasBin: true
 
@@ -5441,7 +5444,7 @@ snapshots:
     dependencies:
       semver: 7.7.1
       shelljs: 0.8.5
-      typescript: 5.9.0-dev.20250221
+      typescript: 5.9.0-dev.20250224
 
   dprint@0.49.0:
     optionalDependencies:
@@ -6983,7 +6986,7 @@ snapshots:
 
   typescript@5.7.3: {}
 
-  typescript@5.9.0-dev.20250221: {}
+  typescript@5.9.0-dev.20250224: {}
 
   undici-types@5.26.5: {}
 
