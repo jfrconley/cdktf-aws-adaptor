@@ -1,5 +1,11 @@
 # @nrfcloud/cdktf-aws-adaptor
 
+## 0.12.0
+
+### Minor Changes
+
+- 1141834: support for cloudformation params
+
 ## 0.11.0
 
 ### Minor Changes
