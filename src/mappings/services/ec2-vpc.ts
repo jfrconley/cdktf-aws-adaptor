@@ -1,4 +1,5 @@
 import { InternetGateway } from "@cdktf/provider-aws/lib/internet-gateway/index.js";
+import { NatGateway } from "@cdktf/provider-aws/lib/nat-gateway/index.js";
 import { RouteTableAssociation } from "@cdktf/provider-aws/lib/route-table-association/index.js";
 import { Route } from "@cdktf/provider-aws/lib/route/index.js";
 import { SecurityGroup, SecurityGroupConfig } from "@cdktf/provider-aws/lib/security-group/index.js";
@@ -7,6 +8,7 @@ import { VpcSecurityGroupIngressRule } from "@cdktf/provider-aws/lib/vpc-securit
 import { Vpc } from "@cdktf/provider-aws/lib/vpc/index.js";
 import {
     CfnInternetGateway,
+    CfnNatGateway,
     CfnRoute,
     CfnSecurityGroup,
     CfnSecurityGroupEgress,
@@ -16,7 +18,6 @@ import {
 } from "aws-cdk-lib/aws-ec2";
 import { Aspects } from "cdktf";
 import { createGenericCCApiMapping, deleteUndefinedKeys, registerMapping, registerMappingTyped } from "../utils.js";
-
 export function registerEC2VPCMappings() {
     registerMappingTyped(CfnInternetGateway, InternetGateway, {
         resource: (scope, id, props) => {
@@ -37,6 +38,42 @@ export function registerEC2VPCMappings() {
 
     registerMapping("AWS::EC2::Subnet", createGenericCCApiMapping("AWS::EC2::Subnet"));
 
+    // registerMappingTyped(CfnSubnet, Subnet, {
+    //     resource: (scope, id, props) => {
+    //         const vpcData = new DataAwsVpc(scope, "VpcData", {
+    //             id: props.VpcId,
+
+    //         });
+    //         vpcData
+
+    //         return new Subnet(scope, id, {
+    //             vpcId: props.VpcId,
+    //             cidrBlock: props.CidrBlock,
+    //             availabilityZone: props.AvailabilityZone,
+    //             mapPublicIpOnLaunch: props.MapPublicIpOnLaunch,
+    //             tags: Object.fromEntries(props?.Tags?.map(({ Key, Value }) => [Key, Value]) || []),
+    //             ipv6CidrBlock: props.Ipv6CidrBlock,
+    //             assignIpv6AddressOnCreation: props.AssignIpv6AddressOnCreation,
+    //             enableDns64: props.EnableDns64,
+    //             availabilityZoneId: props.AvailabilityZoneId,
+    //             enableLniAtDeviceIndex: props.EnableLniAtDeviceIndex,
+    //             ipv6Native: props.Ipv6Native,
+    //             outpostArn: props.OutpostArn,
+    //         });
+    //     },
+    //     attributes: {
+    //         SubnetId: (subnet: Subnet) => subnet.id,
+    //         Ref: (subnet: Subnet) => subnet.id,
+    //         AvailabilityZone: (subnet: Subnet) => subnet.availabilityZone,
+    //         AvailabilityZoneId: (subnet: Subnet) => subnet.availabilityZoneId,
+    //         CidrBlock: (subnet: Subnet) => subnet.cidrBlock,
+    //         Ipv6CidrBlocks: (subnet: Subnet) => [subnet.ipv6CidrBlock],
+    //         VpcId: (subnet: Subnet) => subnet.vpcId,
+    //         OutpostArn: (subnet: Subnet) => subnet.outpostArn,
+    //         NetworkAclAssociationId: (subnet: Subnet) => subnet.networkAclAssociationId,
+    //     },
+    // });
+
     registerMapping("AWS::EC2::RouteTable", createGenericCCApiMapping("AWS::EC2::RouteTable"));
 
     registerMappingTyped(CfnSubnetRouteTableAssociation, RouteTableAssociation, {
@@ -55,6 +92,8 @@ export function registerEC2VPCMappings() {
             Id: (rta: RouteTableAssociation) => rta.id,
         },
     });
+
+    // registerMapping("AWS::EC2::Route", createGenericCCApiMapping("AWS::EC2::Route"));
 
     registerMappingTyped(CfnRoute, Route, {
         resource: (scope, id, props) => {
@@ -89,6 +128,7 @@ export function registerEC2VPCMappings() {
     registerMapping("AWS::EC2::EIP", createGenericCCApiMapping("AWS::EC2::EIP"));
 
     registerMapping("AWS::EC2::NatGateway", createGenericCCApiMapping("AWS::EC2::NatGateway"));
+
     registerMappingTyped(CfnVPC, Vpc, {
         resource: (scope, id, props) => {
             return new Vpc(
@@ -100,6 +140,7 @@ export function registerEC2VPCMappings() {
                     enableDnsSupport: props?.EnableDnsSupport,
                     instanceTenancy: props?.InstanceTenancy,
                     ipv4NetmaskLength: props?.Ipv4NetmaskLength,
+
                     ipv4IpamPoolId: props?.Ipv4IpamPoolId,
                     tags: Object.fromEntries(
                         props?.Tags?.map(({
@@ -261,6 +302,35 @@ export function registerEC2VPCMappings() {
         attributes: {
             Ref: (rule: VpcSecurityGroupEgressRule) => rule.id,
             Id: (rule: VpcSecurityGroupEgressRule) => rule.id,
+        },
+    });
+
+    registerMappingTyped(CfnNatGateway, NatGateway, {
+        resource: (scope, id, props) => {
+            return new NatGateway(
+                scope,
+                id,
+                deleteUndefinedKeys({
+                    allocationId: props.AllocationId,
+                    connectivityType: props.ConnectivityType,
+                    maxDrainDurationSeconds: props.MaxDrainDurationSeconds,
+                    subnetId: props.SubnetId,
+                    privateIp: props.PrivateIpAddress,
+                    secondaryPrivateIpAddressCount: props.SecondaryPrivateIpAddressCount,
+                    secondaryAllocationIds: props.SecondaryAllocationIds,
+                    secondaryPrivateIpAddresses: props.SecondaryPrivateIpAddresses,
+                    tags: Object.fromEntries(
+                        props.Tags?.map(({
+                            Key: key,
+                            Value: value,
+                        }) => [key, value]) || [],
+                    ),
+                }),
+            );
+        },
+        attributes: {
+            Ref: (nat: NatGateway) => nat.id,
+            NatGatewayId: (nat: NatGateway) => nat.id,
         },
     });
 

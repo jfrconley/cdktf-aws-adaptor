@@ -1,10 +1,15 @@
 import { AppsyncGraphqlApi } from "@cdktf/provider-aws/lib/appsync-graphql-api/index.js";
 import { CloudcontrolapiResource } from "@cdktf/provider-aws/lib/cloudcontrolapi-resource/index.js";
+import { EcrRepository } from "@cdktf/provider-aws/lib/ecr-repository/index.js";
 import { IamRole } from "@cdktf/provider-aws/lib/iam-role/index.js";
 import { AwsProvider } from "@cdktf/provider-aws/lib/provider/index.js";
 import { S3BucketPolicy } from "@cdktf/provider-aws/lib/s3-bucket-policy/index.js";
 import { S3Bucket } from "@cdktf/provider-aws/lib/s3-bucket/index.js";
 import { S3Object } from "@cdktf/provider-aws/lib/s3-object/index.js";
+import { Image } from "@cdktf/provider-docker/lib/image/index.js";
+import { RegistryImage } from "@cdktf/provider-docker/lib/registry-image/index.js";
+import { InstanceClass, InstanceSize, InstanceType, NatGatewayProvider, Vpc } from "aws-cdk-lib/aws-ec2";
+import { ContainerImage, FargateTaskDefinition } from "aws-cdk-lib/aws-ecs";
 import { Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { Code, Function, Runtime } from "aws-cdk-lib/aws-lambda";
 import { Bucket, CfnBucketPolicy } from "aws-cdk-lib/aws-s3";
@@ -210,6 +215,30 @@ describe("Stack synthesis", () => {
             // expect(synthed).toHaveResourceWithProperties(CloudcontrolapiResource, {
             //   desired_state:
             //     "${jsonencode({\"BucketName\" = replace(replace(replace(replace(replace(replace(lower(join(\"\", [\"test\", aws_cloudcontrolapi_resource.role_C7B7E775.id])), \"/\", \".\"), \"-\", \"_\"), \"+\", \".\"), \"=\", \"_\"), \",\", \"_\"), \"@\", \".\")})}",
+            // });
+        });
+
+        it("Should resolve CloudFormation parameters", () => {
+            class ParameterStack extends AwsTerraformAdaptorStack {}
+
+            const testApp = Testing.app();
+            const stack = new ParameterStack(testApp, "test-stack", {
+                region: "us-east-1",
+                useCloudControlFallback: true,
+            });
+            new Vpc(stack, "vpc", {
+                maxAzs: 3,
+                natGatewayProvider: NatGatewayProvider.instanceV2({
+                    instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.MICRO),
+                }),
+            });
+
+            stack.prepareStack();
+
+            Testing.synth(stack);
+
+            // expect(synthed).toHaveResourceWithProperties(Vpc, {
+            //     nat_gateway_provider: "Instance",
             // });
         });
     });
@@ -599,6 +628,52 @@ describe("Stack synthesis", () => {
             const assetFileStat = statSync(assetPath);
 
             expect(assetFileStat.isFile()).toBe(true);
+        });
+    });
+
+    it("Should support docker image assets", () => {
+        class DockerImageStack extends AwsTerraformAdaptorStack {}
+        const testApp = Testing.app();
+        const testStack = new DockerImageStack(testApp, "test-stack-15", {
+            region: "us-east-1",
+            useCloudControlFallback: true,
+        });
+
+        const task = new FargateTaskDefinition(testStack, "test-task", {
+            family: "test-task",
+            cpu: 256,
+            memoryLimitMiB: 512,
+            executionRole: new Role(testStack, "test-execution-role", {
+                assumedBy: new ServicePrincipal("ecs-tasks.amazonaws.com"),
+            }),
+        });
+
+        task.addContainer("test-container", {
+            image: ContainerImage.fromAsset(path.join(dirname, "test-app"), {
+                file: "test.Dockerfile",
+            }),
+            essential: true,
+        });
+
+        testStack.prepareStack();
+
+        const synthesized = Testing.synth(testStack);
+
+        // Verify that the ecr repo has been created
+        expect(synthesized).toHaveResourceWithProperties(EcrRepository, {
+            name: expect.stringContaining("image-assets"),
+        });
+
+        const namePattern = /\${join\(\"\", \[aws_ecr_repository.EcrRepository.repository_url, \":[a-z0-9]{64}\"\]\)}/;
+
+        // Verify that the image asset has been created
+        expect(synthesized).toHaveResourceWithProperties(Image, {
+            name: expect.stringMatching(namePattern),
+        });
+
+        // Verify that the repository image has been created
+        expect(synthesized).toHaveResourceWithProperties(RegistryImage, {
+            name: "${docker_image.DockerImagea419971900fbcd890fabf3f99502820d1a3dced62e956d02a2a57bb3af5f2584.name}",
         });
     });
 });

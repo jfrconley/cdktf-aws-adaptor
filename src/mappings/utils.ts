@@ -2,7 +2,7 @@
 
 import { CloudcontrolapiResource } from "@cdktf/provider-aws/lib/cloudcontrolapi-resource/index.js";
 import { CfnResource, IResolvable } from "aws-cdk-lib";
-import { Fn, TerraformResource } from "cdktf";
+import { Fn, type TerraformElement, TerraformResource } from "cdktf";
 import { propertyAccess } from "cdktf/lib/tfExpression.js";
 import { Construct } from "constructs";
 import supportedAwsccResourceTypes from "../lib/core/awscc/supported-types.js";
@@ -25,10 +25,10 @@ export function deleteUndefinedKeys<T>(obj: T): T {
     return obj;
 }
 
-type AttributeMapper<T extends TerraformResource> = (resource: T) => string | IResolvable;
-type AnyAttributeMapper<T extends TerraformResource> = (attribute: string, resource: T) => string | IResolvable;
+type AttributeMapper<T extends TerraformElement> = (resource: T) => string | IResolvable;
+type AnyAttributeMapper<T extends TerraformElement> = (attribute: string, resource: T) => string | IResolvable;
 
-export type Mapping<T extends TerraformResource> = {
+export type Mapping<T extends TerraformElement> = {
     resource: ResourceMapper<T>;
     unsupportedProps?: string[];
     attributes: {

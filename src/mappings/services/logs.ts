@@ -1,5 +1,5 @@
-import { cloudwatchLogIndexPolicy } from "@cdktf/provider-aws";
 import { CloudwatchLogGroup, CloudwatchLogGroupConfig } from "@cdktf/provider-aws/lib/cloudwatch-log-group/index.js";
+import { CloudwatchLogIndexPolicy } from "@cdktf/provider-aws/lib/cloudwatch-log-index-policy/index.js";
 import {
     CloudwatchLogResourcePolicy,
     CloudwatchLogResourcePolicyConfig,
@@ -73,7 +73,7 @@ export function registerLogMappings() {
                 proxy.touchPath("FieldIndexPolicies");
                 for (const [idx, policy] of props.FieldIndexPolicies.entries()) {
                     implicitDependencies.push(
-                        new cloudwatchLogIndexPolicy.CloudwatchLogIndexPolicy(logGroup, `index-policy-${idx}`, {
+                        new CloudwatchLogIndexPolicy(logGroup, `index-policy-${idx}`, {
                             logGroupName: logGroup.name,
                             policyDocument: Fn.jsonencode(policy),
                         }),
@@ -106,3 +106,4 @@ export function registerLogMappings() {
         },
     });
 }
+3;

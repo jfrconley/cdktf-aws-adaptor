@@ -376,14 +376,6 @@ exports[`EC2 VPC mappings > Should provision all the components of a VPC 1`] = `
         "desired_state": "\${jsonencode({\\"Domain\\" = \\"vpc\\"})}",
         "type_name": "AWS::EC2::EIP"
       },
-      "resource_PublicSubnet1_NATGateway_BA73323D": {
-        "depends_on": [
-          "aws_route_table_association.resource_PublicSubnet1_RouteTableAssociation_C1359716",
-          "aws_route.resource_PublicSubnet1_DefaultRoute_1F0D9FA0"
-        ],
-        "desired_state": "\${jsonencode({\\"AllocationId\\" = jsondecode(aws_cloudcontrolapi_resource.resource_PublicSubnet1_EIP_9ED2119C.properties).AllocationId, \\"SubnetId\\" = aws_cloudcontrolapi_resource.resource_PublicSubnet1_Subnet_334F89CE.id})}",
-        "type_name": "AWS::EC2::NatGateway"
-      },
       "resource_PublicSubnet1_RouteTable_A84723D1": {
         "desired_state": "\${jsonencode({\\"VpcId\\" = aws_vpc.resource_AACBEC77.id})}",
         "type_name": "AWS::EC2::RouteTable"
@@ -408,15 +400,25 @@ exports[`EC2 VPC mappings > Should provision all the components of a VPC 1`] = `
         "vpc_id": "\${aws_vpc.resource_AACBEC77.id}"
       }
     },
+    "aws_nat_gateway": {
+      "resource_PublicSubnet1_NATGateway_BA73323D": {
+        "allocation_id": "\${jsondecode(aws_cloudcontrolapi_resource.resource_PublicSubnet1_EIP_9ED2119C.properties).AllocationId}",
+        "depends_on": [
+          "aws_route_table_association.resource_PublicSubnet1_RouteTableAssociation_C1359716",
+          "aws_route.resource_PublicSubnet1_DefaultRoute_1F0D9FA0"
+        ],
+        "subnet_id": "\${aws_cloudcontrolapi_resource.resource_PublicSubnet1_Subnet_334F89CE.id}"
+      }
+    },
     "aws_route": {
       "resource_PrivateSubnet1_DefaultRoute_EDAF69FB": {
         "destination_cidr_block": "0.0.0.0/0",
-        "nat_gateway_id": "\${aws_cloudcontrolapi_resource.resource_PublicSubnet1_NATGateway_BA73323D.id}",
+        "nat_gateway_id": "\${aws_nat_gateway.resource_PublicSubnet1_NATGateway_BA73323D.id}",
         "route_table_id": "\${aws_cloudcontrolapi_resource.resource_PrivateSubnet1_RouteTable_19EB98C9.id}"
       },
       "resource_PrivateSubnet2_DefaultRoute_8696734F": {
         "destination_cidr_block": "0.0.0.0/0",
-        "nat_gateway_id": "\${aws_cloudcontrolapi_resource.resource_PublicSubnet1_NATGateway_BA73323D.id}",
+        "nat_gateway_id": "\${aws_nat_gateway.resource_PublicSubnet1_NATGateway_BA73323D.id}",
         "route_table_id": "\${aws_cloudcontrolapi_resource.resource_PrivateSubnet2_RouteTable_EB0EBC65.id}"
       },
       "resource_PublicSubnet1_DefaultRoute_1F0D9FA0": {
